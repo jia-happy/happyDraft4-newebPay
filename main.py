@@ -45,7 +45,7 @@ def create_payment(req: PaymentRequest):
         "PaymentInfo": "Y",
         "OrderInfo": "N",
         "EmailModify": "1",
-        "NotifyURL": "https://yourdomain.com/notify",  # 改成你實際的網址
+        "NotifyURL": "https://happydraft4-newebpay.onrender.com/payment/notify",  # 改成你實際的網址
     }
 
     # 把「鍵值對的字典」轉換成「URL query string 形式」
