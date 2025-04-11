@@ -1,0 +1,4 @@
+fastapi
+uvicorn
+pycryptodome
+python-multipart
