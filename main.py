@@ -1,11 +1,24 @@
 from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+from Crypto.Cipher import AES
 import time
 import urllib.parse
-from Crypto.Cipher import AES
 import binascii
 
 app = FastAPI()
+
+# ✅ 加上這段：允許從 Framer Canvas 來的請求
+app.add_middleware(
+    CORSMiddleware,
+    # allow_origins=[
+    #     "https://ha-pp-y.kitchen/",  # 改成你的 Framer 網域
+    # ],
+    allow_origins=["*"], # 測試開發中可以先允許所有網域
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # 測試用密鑰（請換成實際值）
 HASH_KEY = "OKEaRtuSXR9pKozzvj4Fq3EYNc8W92jj"
