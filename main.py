@@ -21,9 +21,9 @@ app.add_middleware(
 )
 
 # 測試用密鑰（請換成實際值）
-HASH_KEY = "IaWudQJsuOT994cpHRWzv7Ge67yC1cE3"
-HASH_IV = "C1dLm3nxZRVlmBSP"
-MERCHANT_ID = "TEK1682407426"
+HASH_KEY = "OKEaRtuSXR9pKozzvj4Fq3EYNc8W92jj"
+HASH_IV = "PSqcgIiqkWrLmppC"
+MERCHANT_ID = "MS3780269062"
 
 class PaymentRequest(BaseModel):
     email: str
@@ -38,6 +38,24 @@ def aes_encrypt(data: str):
     cipher = AES.new(HASH_KEY.encode('utf-8'), AES.MODE_CBC, HASH_IV.encode('utf-8'))
     encrypted = cipher.encrypt(pad(data).encode('utf-8'))
     return binascii.hexlify(encrypted).decode('utf-8')
+
+def strip_padding(data: bytes) -> str:
+    """移除 PKCS7 Padding"""
+    padding_len = data[-1]
+    return data[:-padding_len].decode("utf-8")
+
+def aes_decrypt(encrypted_hex: str) -> str:
+    # 將 hex 轉換為 bytes
+    encrypted_bytes = binascii.unhexlify(encrypted_hex)
+    
+    # 建立 AES 解密器（使用 CBC 模式）
+    cipher = AES.new(HASH_KEY.encode('utf-8'), AES.MODE_CBC, HASH_IV.encode('utf-8'))
+    
+    # 解密並去除 padding
+    decrypted_bytes = cipher.decrypt(encrypted_bytes)
+    decrypted_text = strip_padding(decrypted_bytes)
+
+    return decrypted_text
 
 @app.post("/create-payment")
 def create_payment(req: PaymentRequest):
@@ -66,6 +84,7 @@ def create_payment(req: PaymentRequest):
 
     # Step2: 將請求字串加密
     encrypted = aes_encrypt(raw)
+    # print("🔒encrypted:",encrypted)
 
     return {
         "MerchantID_": MERCHANT_ID,
@@ -73,14 +92,16 @@ def create_payment(req: PaymentRequest):
         "ActionURL": "https://ccore.newebpay.com/MPG/period"
     }
 
-
-
+# Step4: 結果
 @app.post("/payment/notify")
 async def payment_notify(request: Request):
     form = await request.form()
-    trade_info = form.get("TradeInfo")
+    encrypted = form.get("TradeInfo")
 
-    # 解密 trade_info（略）
+    if not encrypted:
+        return "0|No TradeInfo"
 
-    print("🔔 收到藍新通知：", trade_info)
-    return "1|OK"  # 必須回傳這行表示成功接收
+    # Step5: 將加密字串進行解密
+    decrypted = aes_decrypt(encrypted)
+    print("🔓 解密後內容：", decrypted)
+    return "1|OK"
