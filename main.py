@@ -61,6 +61,7 @@ def aes_decrypt(encrypted_hex: str) -> str:
 def create_payment(req: PaymentRequest):
     # Step 1: 生成請求字串
     payload = {
+        "MerchantID": MERCHANT_ID,
         "RespondType": "JSON",
         "TimeStamp": str(int(time.time())),
         "Version": "1.5",
@@ -81,11 +82,13 @@ def create_payment(req: PaymentRequest):
 
     # 把「鍵值對的字典」轉換成「URL query string 形式」
     raw = urllib.parse.urlencode(payload)
+    print("🔍 加密前:", raw)
 
     # Step2: 將請求字串加密
     encrypted = aes_encrypt(raw)
-    # print("🔒encrypted:",encrypted)
+    print("🔒 加密後:",encrypted)
 
+    # Step3: 發布請求 
     return {
         "MerchantID_": MERCHANT_ID,
         "PostData_": encrypted,
