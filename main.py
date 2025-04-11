@@ -21,9 +21,9 @@ app.add_middleware(
 )
 
 # 測試用密鑰（請換成實際值）
-HASH_KEY = "OKEaRtuSXR9pKozzvj4Fq3EYNc8W92jj"
-HASH_IV = "PSqcgIiqkWrLmppC"
-MERCHANT_ID = "MS3780269062"
+HASH_KEY = "IaWudQJsuOT994cpHRWzv7Ge67yC1cE3"
+HASH_IV = "C1dLm3nxZRVlmBSP"
+MERCHANT_ID = "TEK1682407426"
 
 class PaymentRequest(BaseModel):
     email: str
@@ -66,7 +66,6 @@ def create_payment(req: PaymentRequest):
 
     # Step2: 將請求字串加密
     encrypted = aes_encrypt(raw)
-    print("🔒 encrypted:",encrypted)
 
     return {
         "MerchantID_": MERCHANT_ID,
