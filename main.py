@@ -66,6 +66,7 @@ def create_payment(req: PaymentRequest):
 
     # Step2: 將請求字串加密
     encrypted = aes_encrypt(raw)
+    print("🔒 encrypted:",encrypted)
 
     return {
         "MerchantID_": MERCHANT_ID,
