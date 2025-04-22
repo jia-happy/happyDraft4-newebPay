@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <title>藍新定期定額測試送出</title>
+</head>
+<body>
+  <h2>🔐 藍新 NewebPay 定期定額測試工具</h2>
+
+  <form id="payForm" method="POST" action="https://ccore.newebpay.com/MPG/period">
+    <label for="merchantID">MerchantID_：</label><br />
+    <input type="text" id="merchantID" name="MerchantID_" value="MS3780269062" style="width: 600px;"><br><br>
+
+    <label for="postData">PostData_（請貼上後端加密後的結果）：</label><br />
+    <!-- 3118b7f9ff2bb7466175a78e7dc6969180843aebcab02743537df4550b0e097ea8e5b57007a5fd550b808a28b1a846b5a8426ba000da55df7ad549dc39d679f19cc917683a0c146c054e442b051dd1aacb5693703b02dd78331b42a6460106e8785af6fc0d7a620e35b28491ae8a90c508a8276f477086925bf6b454ffaf79ccf43c64cdeda5a253529a68226b26b78dc047e0202ff4839cb1909a7bcd98fb6ade792403c70c8fcf0845cf497b006dbf00a1dcebda4b8cfaaa05248ece0ff6bebe7394b85f6c37c0d07a3ddcb2d2a40d28001d7d737dbd20f1d3a40b502252eefe46b8272cefc1908d299a70ba391f9bebe4d4b5e678be29291f2cdd9aafdbe343ba053d8c238243d4dc4e775c7a557ca15d6cf7f9ec0683bc4a188bef89cb4039df495d22778183a55e87026442e710bbdc25734f65f28b43f88662457d231486b53fd6c82278b1a3989d5967a7cc3a9f079ee89443f069504bf2a1fba5eaf8b21050f27be9c78354f263c35bb2480b83f0b28048b42be7ad078b81db97602b6e7a0270f3f41568ea555aeba5864b96d053a02a5c7867d3335cdf422fc4c559 -->
+    <textarea id="postData" name="PostData_" rows="10" style="width: 600px;"></textarea><br><br>
+
+    <button type="submit">🚀 送出到藍新付款頁</button>
+  </form>
+</body>
+</html>
