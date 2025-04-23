@@ -124,7 +124,9 @@ def create_payment(req: PaymentRequest):
         "OrderInfo": "N",
         "EmailModify": "1",
         "NotifyURL": "https://happydraft4-newebpay.onrender.com/payment/notify",  # 改成你實際的網址
-        "ReturnURL": "https://ha-pp-y.kitchen/account",  # ✅ 設定導回的網址
+        # "ReturnURL": "https://ha-pp-y.kitchen/account",  # ✅ 自動跳轉
+        "ClientBackURL": "https://ha-pp-y.kitchen/account",  # ✅ 使用者手動跳轉
+
     }
 
     # 把「鍵值對的字典」轉換成「URL query string 形式」
