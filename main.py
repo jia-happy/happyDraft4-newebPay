@@ -64,13 +64,15 @@ def aes_decrypt(encrypted_hex: str) -> str:
 @app.post("/create-payment")
 def create_payment(req: PaymentRequest):
     # Step 1: 生成請求字串
+    safe_email = req.email.replace("@", "_at_").replace(".", "_dot_")
+    order_id = f"ORDER_{int(time.time())}_{safe_email}"  # 把使用者 ID 放進去
     payload = {
         "MerchantID": MERCHANT_ID,
         "RespondType": "JSON",
         "TimeStamp": str(int(time.time())),
         "Version": "1.5",
         "LangType": "zh-Tw",
-        "MerOrderNo": req.order_id,
+        "MerOrderNo": order_id,
         "ProdDesc": "訂閱方案",
         "PeriodAmt": str(req.amount),
         "PeriodType": "M",
