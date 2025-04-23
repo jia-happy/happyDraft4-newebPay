@@ -61,6 +61,11 @@ def aes_decrypt(encrypted_hex: str) -> str:
         print("❌ 解密失敗：", str(e))
         return "Decryption failed"
 
+def send_email(subject, body):
+    yag = yagmail.SMTP("happy.it.engineer@gmail.com", "kvxxurwgcihmsqca")  # 建議開啟 2FA
+    yag.send(to="jia@ha-pp-y.com", subject=subject, contents=body)
+    # yag.send(to=result.get("PayerEmail"), subject="感謝您的訂閱", contents="我們已收到您的付款，訂單編號：..." )
+
 @app.post("/create-payment")
 def create_payment(req: PaymentRequest):
     # Step 1: 生成請求字串
@@ -117,4 +122,20 @@ async def payment_notify(request: Request):
     # Step5: 將加密字串進行解密
     decrypted = aes_decrypt(encrypted)
     print("🔓 解密後內容：", decrypted)
+
+
+    data = json.loads(decrypted)
+    result = data.get("Result", {})
+
+    # ✅ 傳給 Google Apps Script
+    try:
+        gsheet_url = "https://script.google.com/macros/s/AKfycbzA3oMWS7eBAhN3LyyVWVeX8qtBjx_mdWSAv7203gjAKSl7faylevrO_By39BfpeIX_yg/exec"
+        gsheet_response = requests.post(gsheet_url, json=result)
+        print("📤 已送出至 Google Sheets:", gsheet_response.text)
+    except Exception as e:
+        print("⚠️ 發送 Google Sheets 失敗:", str(e))
+    
+    print("✉️ 收到付款通知email寄出")
+    send_email("收到付款通知", f"訂單 {result.Result.MerchantOrderNo} 成功付款 {result.Result.PeriodAmt} 元")
+
     return "1|OK"
