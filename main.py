@@ -72,12 +72,12 @@ def create_payment(req: PaymentRequest):
     # safe_email = req.email.replace("@", "_at_").replace(".", "_dot_")
     # order_id = f"ORDER_{int(time.time())}_{safe_email}"  # 把使用者 ID 放進去
     payload = {
-        "MerchantID": str(int(time.time())),
+        "MerchantID": "MS355719396",
         "RespondType": "JSON",
         "TimeStamp": str(int(time.time())),
         "Version": "1.5",
         "LangType": "zh-Tw",
-        "MerOrderNo": order_id,
+        "MerOrderNo": str(int(time.time())),
         "ProdDesc": "訂閱方案",
         "PeriodAmt": str(req.amount),
         "PeriodType": "M",
