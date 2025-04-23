@@ -111,12 +111,13 @@ def create_payment(req: PaymentRequest):
         "PeriodType": "M",
         "PeriodPoint": "05",
         "PeriodStartType": "2",
-        "PeriodTimes": "1",
+        "PeriodTimes": "12",
         "PayerEmail": req.email,
         "PaymentInfo": "Y",
         "OrderInfo": "N",
         "EmailModify": "1",
         "NotifyURL": "https://happydraft4-newebpay.onrender.com/payment/notify",  # 改成你實際的網址
+        "ReturnURL": "https://ha-pp-y.kitchen/account",  # ✅ 設定導回的網址
     }
 
     # 把「鍵值對的字典」轉換成「URL query string 形式」
@@ -166,7 +167,7 @@ async def payment_notify(request: Request):
     # 👉 根據訂單號碼找 email
     order_no = result.get("MerchantOrderNo")
     # email = order_email_map.get(order_no, "無紀錄 Email")
-    amt = result.get("Amt")
+    amt = result.get("PeriodAmt")
 
     # ✅ 從訂單記憶中找回 Email，若找不到就給預設值
     order = order_email_map.get(order_no, {})
