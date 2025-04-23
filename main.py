@@ -124,7 +124,7 @@ def create_payment(req: PaymentRequest):
         "OrderInfo": "N",
         "EmailModify": "1",
         "NotifyURL": "https://happydraft4-newebpay.onrender.com/payment/notify",  # 改成你實際的網址
-        "ReturnURL": "https://ha-pp-y.kitchen/anewebpay-return",  # ✅ 自動跳轉
+        "ReturnURL": "https://ha-pp-y.kitchen/newebpay-return",  # ✅ 自動跳轉
         # "ClientBackURL": "https://ha-pp-y.kitchen/account",  # ✅ 一般一次性交易顯示一個 「返回商店」按鈕，使用者手動跳轉
 
     }
