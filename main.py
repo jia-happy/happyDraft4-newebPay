@@ -103,6 +103,9 @@ def create_payment(req: PaymentRequest):
 @app.post("/payment/notify")
 async def payment_notify(request: Request):
     form = await request.form()
+    print("📩 收到 Notify POST")
+    print("📦 原始內容：", dict(form))
+    
     encrypted = form.get("TradeInfo")
 
     if not encrypted:
