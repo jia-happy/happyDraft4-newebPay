@@ -106,10 +106,11 @@ async def payment_notify(request: Request):
     print("📩 收到 Notify POST")
     print("📦 原始內容：", dict(form))
     
-    encrypted = form.get("TradeInfo")
+    # ✅ 定期定額使用 Period 欄位
+    encrypted = form.get("Period")
 
     if not encrypted:
-        return "0|No TradeInfo"
+        return "0|No Period"
 
     # Step5: 將加密字串進行解密
     decrypted = aes_decrypt(encrypted)
