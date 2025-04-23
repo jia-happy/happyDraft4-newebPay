@@ -7,6 +7,7 @@ import urllib.parse
 import binascii
 import requests
 import json
+import yagmail
 
 app = FastAPI()
 
