@@ -1,5 +1,6 @@
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import RedirectResponse
 from pydantic import BaseModel
 from Crypto.Cipher import AES
 import time
@@ -124,7 +125,8 @@ def create_payment(req: PaymentRequest):
         "OrderInfo": "N",
         "EmailModify": "1",
         "NotifyURL": "https://happydraft4-newebpay.onrender.com/payment/notify",  # 改成你實際的網址
-        "ReturnURL": "https://ha-pp-y.kitchen/newebpay-return",  # ✅ 自動跳轉
+        "ReturnURL": "https://happydraft4-newebpay.onrender.com/newebpay-return",  # ✅ 自動跳轉
+        
         # "ClientBackURL": "https://ha-pp-y.kitchen/account",  # ✅ 一般一次性交易顯示一個 「返回商店」按鈕，使用者手動跳轉
 
     }
@@ -238,3 +240,11 @@ def alter_status(order_id: str, period_no: str, action: str):
 
     except Exception as e:
         return {"error": str(e)}
+
+
+
+
+@app.post("/newebpay-return")
+async def newebpay_return():
+    # ✅ 付款成功導回此頁 → 自動轉 GET 頁面
+    return RedirectResponse(url="https://ha-pp-y.kitchen/newebpay-return", status_code=303)
