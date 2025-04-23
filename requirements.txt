@@ -2,3 +2,4 @@ fastapi
 uvicorn
 pycryptodome
 python-multipart
+requests
