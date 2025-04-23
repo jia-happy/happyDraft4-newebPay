@@ -144,7 +144,7 @@ async def payment_notify(request: Request):
     # ✅ 傳給 Google Apps Script
     try:
         result["PayerEmail"] = email  # ✅ 加入 email 到結果中
-        gsheet_url = "https://script.google.com/macros/s/AKfycbybyj91SpahyqU83dULOjr71e0wRsxQeCAx9j-2IA5gp7jt1czI2BcXBIAXkiXkZCPmjA/exec"
+        gsheet_url = "https://script.google.com/macros/s/AKfycbz5OHCQXtugO0wCGSI_ZM-afI3OAcPjWY0xhBvN-7dUSkT-j2yHi90J4jrMbAqWCKQbaQ/exec"
         gsheet_response = requests.post(gsheet_url, json=result)
         print("📤 已送出至 Google Sheets:", gsheet_response.text)
     except Exception as e:
