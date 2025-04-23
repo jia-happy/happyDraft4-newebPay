@@ -84,40 +84,40 @@ def create_payment(req: PaymentRequest):
     # Step 1: 生成請求字串
     # safe_email = req.email.replace("@", "_at_").replace(".", "_dot_")
     # order_id = f"ORDER_{int(time.time())}_{safe_email}"  # 把使用者 ID 放進去
-    payload = {
-        "MerchantID": MERCHANT_ID,
-        "RespondType": "JSON",
-        "TimeStamp": timeStamp,
-        "Version": "2.0",
-        "LangType": "zh-tw",
-        "MerchantOrderNo": timeStamp,
-        "Amt": str(req.amount),
-        "ItemDesc": "即時付款訂閱",
-        "Email": req.email,
-        "EmailModify": "1",
-        "CREDIT": "1",
-        "NotifyURL": "https://happydraft4-newebpay.onrender.com/payment/notify",
-        "ReturnURL": "https://ha-pp-y.kitchen/success"
-    }
     # payload = {
-    #     "MerchantID": "MS355719396",
+    #     "MerchantID": MERCHANT_ID,
     #     "RespondType": "JSON",
     #     "TimeStamp": timeStamp,
-    #     "Version": "1.5",
-    #     "LangType": "zh-Tw",
-    #     "MerOrderNo": timeStamp,
-    #     "ProdDesc": "訂閱方案",
-    #     "PeriodAmt": str(req.amount),
-    #     "PeriodType": "M",
-    #     "PeriodPoint": "05",
-    #     "PeriodStartType": "2",
-    #     "PeriodTimes": "1",
-    #     "PayerEmail": req.email,
-    #     "PaymentInfo": "Y",
-    #     "OrderInfo": "N",
+    #     "Version": "2.0",
+    #     "LangType": "zh-tw",
+    #     "MerchantOrderNo": timeStamp,
+    #     "Amt": str(req.amount),
+    #     "ItemDesc": "即時付款訂閱",
+    #     "Email": req.email,
     #     "EmailModify": "1",
-    #     "NotifyURL": "https://happydraft4-newebpay.onrender.com/payment/notify",  # 改成你實際的網址
+    #     "CREDIT": "1",
+    #     "NotifyURL": "https://happydraft4-newebpay.onrender.com/payment/notify",
+    #     "ReturnURL": "https://ha-pp-y.kitchen/success"
     # }
+    payload = {
+        "MerchantID": "MS355719396",
+        "RespondType": "JSON",
+        "TimeStamp": timeStamp,
+        "Version": "1.5",
+        "LangType": "zh-Tw",
+        "MerOrderNo": timeStamp,
+        "ProdDesc": "訂閱方案",
+        "PeriodAmt": str(req.amount),
+        "PeriodType": "M",
+        "PeriodPoint": "05",
+        "PeriodStartType": "2",
+        "PeriodTimes": "1",
+        "PayerEmail": req.email,
+        "PaymentInfo": "Y",
+        "OrderInfo": "N",
+        "EmailModify": "1",
+        "NotifyURL": "https://happydraft4-newebpay.onrender.com/payment/notify",  # 改成你實際的網址
+    }
 
     # 把「鍵值對的字典」轉換成「URL query string 形式」
     raw = urllib.parse.urlencode(payload)
@@ -126,22 +126,22 @@ def create_payment(req: PaymentRequest):
     # Step2: 將請求字串加密
     encrypted = aes_encrypt(raw)
     # print("🔒 加密後:",encrypted)
-    hashstr = f"HashKey={HASH_KEY}&{encrypted}&HashIV={HASH_IV}"
-    trade_sha = (hashlib.sha256(hashstr.encode("utf-8")).hexdigest()).upper()
+    # hashstr = f"HashKey={HASH_KEY}&{encrypted}&HashIV={HASH_IV}"
+    # trade_sha = (hashlib.sha256(hashstr.encode("utf-8")).hexdigest()).upper()
 
     # Step3: 發布請求 
-    return {
-        "MerchantID": MERCHANT_ID,
-        "TradeInfo": encrypted,
-        "TradeSha": trade_sha,
-        "Version": "2.0",
-        "ActionURL": "https://ccore.newebpay.com/MPG/mpg_gateway"
-    }
     # return {
-    #     "MerchantID_": MERCHANT_ID,
-    #     "PostData_": encrypted,
-    #     "ActionURL": "https://ccore.newebpay.com/MPG/period"
+    #     "MerchantID": MERCHANT_ID,
+    #     "TradeInfo": encrypted,
+    #     "TradeSha": trade_sha,
+    #     "Version": "2.0",
+    #     "ActionURL": "https://ccore.newebpay.com/MPG/mpg_gateway"
     # }
+    return {
+        "MerchantID_": MERCHANT_ID,
+        "PostData_": encrypted,
+        "ActionURL": "https://ccore.newebpay.com/MPG/period"
+    }
 
 # Step4: 結果
 @app.post("/payment/notify")
@@ -150,11 +150,11 @@ async def payment_notify(request: Request):
     print("📩 收到 Notify POST")
     print("📦 原始內容：", dict(form))
     
-    encrypted = form.get("TradeInfo")
+    # encrypted = form.get("TradeInfo")
     # ✅ 定期定額使用 Period 欄位
-    # encrypted = form.get("Period")
+    encrypted = form.get("Period")
     if not encrypted:
-        return "0|No TradeInfo"
+        return "0|No Period"
 
     # Step5: 將加密字串進行解密
     decrypted = aes_decrypt(encrypted)
