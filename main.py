@@ -122,7 +122,6 @@ async def payment_notify(request: Request):
     
     # ✅ 定期定額使用 Period 欄位
     encrypted = form.get("Period")
-
     if not encrypted:
         return "0|No Period"
 
@@ -130,25 +129,23 @@ async def payment_notify(request: Request):
     decrypted = aes_decrypt(encrypted)
     print("🔓 解密後內容：", decrypted)
 
-
     data = json.loads(decrypted)
     result = data.get("Result", {})
 
-
     # 👉 根據訂單號碼找 email
     order_no = result.get("MerchantOrderNo")
-    email = order_email_map.get(order_no, "無紀錄 Email")
+    # email = order_email_map.get(order_no, "無紀錄 Email")
     amt = result.get("PeriodAmt")
 
     # ✅ 從訂單記憶中找回 Email，若找不到就給預設值
     email = order_email_map.get(order_no, "unknown@example.com")
-
     # ✅ 加入 email 到傳送資料中
     result["PayerEmail"] = email
 
     # ✅ 傳給 Google Apps Script
     try:
-        gsheet_url = "https://script.google.com/macros/s/AKfycbz5OHCQXtugO0wCGSI_ZM-afI3OAcPjWY0xhBvN-7dUSkT-j2yHi90J4jrMbAqWCKQbaQ/exec"
+        result["PayerEmail"] = email  # ✅ 加入 email 到結果中
+        gsheet_url = "https://script.google.com/macros/s/AKfycbxEAjNNp8s9O0-9Y6g1wpn-ZqzTHdN0Ewgha9Bu7QaKyeOFPW8hZ6ARHsT_giEjDJq-Iw/exec"
         gsheet_response = requests.post(gsheet_url, json=result)
         print("📤 已送出至 Google Sheets:", gsheet_response.text)
     except Exception as e:
