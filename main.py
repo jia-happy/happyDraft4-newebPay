@@ -129,7 +129,7 @@ async def payment_notify(request: Request):
 
     # ✅ 傳給 Google Apps Script
     try:
-        gsheet_url = "https://script.google.com/macros/s/AKfycbzA3oMWS7eBAhN3LyyVWVeX8qtBjx_mdWSAv7203gjAKSl7faylevrO_By39BfpeIX_yg/exec"
+        gsheet_url = "https://script.google.com/macros/s/AKfycbybyj91SpahyqU83dULOjr71e0wRsxQeCAx9j-2IA5gp7jt1czI2BcXBIAXkiXkZCPmjA/exec"
         gsheet_response = requests.post(gsheet_url, json=result)
         print("📤 已送出至 Google Sheets:", gsheet_response.text)
     except Exception as e:
