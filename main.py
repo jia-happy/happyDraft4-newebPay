@@ -28,7 +28,7 @@ MERCHANT_ID = "MS355719396"
 class PaymentRequest(BaseModel):
     email: str
     amount: int
-    order_id: str
+    # order_id: str
 
 def pad(data: str):
     pad_len = 32 - (len(data.encode('utf-8')) % 32)
