@@ -247,4 +247,31 @@ def alter_status(order_id: str, period_no: str, action: str):
 @app.post("/newebpay-return")
 async def newebpay_return():
     # ✅ 付款成功導回此頁 → 自動轉 GET 頁面
-    return RedirectResponse(url="https://ha-pp-y.kitchen/newebpay-return", status_code=303)
+    form = await request.form()
+    print("🔁 回傳資料：", dict(form))
+
+    # 從表單取出訂單編號（如有）
+    order_no = form.get("MerchantOrderNo", "")
+    status = form.get("Status", "")
+    period = form.get("Period", "")
+    result = "unknown"
+    
+    if status == "SUCCESS" and period:
+        decrypted = aes_decrypt(period)
+        print("🔓 ReturnURL 解密結果:", decrypted)
+
+        try:
+            data = json.loads(decrypted)
+            result = "success"
+        except:
+            result = "error"
+    else:
+        result = "fail"
+
+    # ✅ 導回前端，帶參數
+    return RedirectResponse(
+        url=f"https://ha-pp-y.kitchen/account?status={result}&order={order_no}",
+        status_code=303
+    )
+    
+    # return RedirectResponse(url="https://ha-pp-y.kitchen/account", status_code=303)
