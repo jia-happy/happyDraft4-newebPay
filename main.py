@@ -45,17 +45,21 @@ def strip_padding(data: bytes) -> str:
     return data[:-padding_len].decode("utf-8")
 
 def aes_decrypt(encrypted_hex: str) -> str:
-    # 將 hex 轉換為 bytes
-    encrypted_bytes = binascii.unhexlify(encrypted_hex)
-    
-    # 建立 AES 解密器（使用 CBC 模式）
-    cipher = AES.new(HASH_KEY.encode('utf-8'), AES.MODE_CBC, HASH_IV.encode('utf-8'))
-    
-    # 解密並去除 padding
-    decrypted_bytes = cipher.decrypt(encrypted_bytes)
-    decrypted_text = strip_padding(decrypted_bytes)
+    try:
+        # 將 hex 轉換為 bytes
+        encrypted_bytes = binascii.unhexlify(encrypted_hex)
+        
+        # 建立 AES 解密器（使用 CBC 模式）
+        cipher = AES.new(HASH_KEY.encode('utf-8'), AES.MODE_CBC, HASH_IV.encode('utf-8'))
+        
+        # 解密並去除 padding
+        decrypted_bytes = cipher.decrypt(encrypted_bytes)
+        decrypted_text = strip_padding(decrypted_bytes)
 
-    return decrypted_text
+        return decrypted_text
+    except Exception as e:
+        print("❌ 解密失敗：", str(e))
+        return "Decryption failed"
 
 @app.post("/create-payment")
 def create_payment(req: PaymentRequest):
@@ -82,11 +86,11 @@ def create_payment(req: PaymentRequest):
 
     # 把「鍵值對的字典」轉換成「URL query string 形式」
     raw = urllib.parse.urlencode(payload)
-    print("🔍 加密前:", raw)
+    # print("🔍 加密前:", raw)
 
     # Step2: 將請求字串加密
     encrypted = aes_encrypt(raw)
-    print("🔒 加密後:",encrypted)
+    # print("🔒 加密後:",encrypted)
 
     # Step3: 發布請求 
     return {
