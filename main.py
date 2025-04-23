@@ -146,14 +146,14 @@ async def payment_notify(request: Request):
     order = order_email_map.get(order_no, {})
     email = order.get("email", "unknown@example.com")
     company = order.get("company", "未知公司")
-    
+
     # ✅ 加入 email 到傳送資料中
     result["PayerEmail"] = email
     result["CompanyName"] = company
 
     # ✅ 傳給 Google Apps Script
     try:
-        gsheet_url = "https://script.google.com/macros/s/AKfycbxEAjNNp8s9O0-9Y6g1wpn-ZqzTHdN0Ewgha9Bu7QaKyeOFPW8hZ6ARHsT_giEjDJq-Iw/exec"
+        gsheet_url = "https://script.google.com/macros/s/AKfycbxJiz4ytGDaa9bi570MdJEALrpmrbD1bnWJVgO5FR1aaguRkDbsKLrPXi_5KxUKkp5Amg/exec"
         gsheet_response = requests.post(gsheet_url, json=result)
         print("📤 已送出至 Google Sheets:", gsheet_response.text)
     except Exception as e:
