@@ -31,6 +31,7 @@ MERCHANT_ID = "MS355719396"
 class PaymentRequest(BaseModel):
     email: str
     amount: int
+    companyName: str
     # order_id: str
 
 def pad(data: str):
@@ -74,7 +75,11 @@ order_email_map = {}
 @app.post("/create-payment")
 def create_payment(req: PaymentRequest):
     timeStamp = str(int(time.time()))
-    order_email_map[timeStamp] = req.email  # ✅ 儲存 Email
+    order_email_map[timeStamp] = {
+        "email": req.email,
+        "company": req.companyName
+    }  # ✅ 儲存 Email
+
     # Step 1: 生成請求字串
     # safe_email = req.email.replace("@", "_at_").replace(".", "_dot_")
     # order_id = f"ORDER_{int(time.time())}_{safe_email}"  # 把使用者 ID 放進去
@@ -138,13 +143,16 @@ async def payment_notify(request: Request):
     amt = result.get("PeriodAmt")
 
     # ✅ 從訂單記憶中找回 Email，若找不到就給預設值
-    email = order_email_map.get(order_no, "unknown@example.com")
+    order = order_email_map.get(order_no, {})
+    email = order.get("email", "unknown@example.com")
+    company = order.get("company", "未知公司")
+    
     # ✅ 加入 email 到傳送資料中
     result["PayerEmail"] = email
+    result["CompanyName"] = company
 
     # ✅ 傳給 Google Apps Script
     try:
-        result["PayerEmail"] = email  # ✅ 加入 email 到結果中
         gsheet_url = "https://script.google.com/macros/s/AKfycbxEAjNNp8s9O0-9Y6g1wpn-ZqzTHdN0Ewgha9Bu7QaKyeOFPW8hZ6ARHsT_giEjDJq-Iw/exec"
         gsheet_response = requests.post(gsheet_url, json=result)
         print("📤 已送出至 Google Sheets:", gsheet_response.text)
@@ -152,6 +160,6 @@ async def payment_notify(request: Request):
         print("⚠️ 發送 Google Sheets 失敗:", str(e))
     
     print("✉️ 收到付款通知email寄出")
-    send_email("收到付款通知", f"訂單 {order_no} 成功付款 {amt} 元")
+    send_email(f"ha-pp-y™ Kitchen 訂閱通知 - {order_no}", f"您好，\n\n您的訂單 {order_no} 已成功付款 {amt} 元，\n\n謝謝您！")
 
     return "1|OK"
