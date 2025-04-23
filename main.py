@@ -140,10 +140,14 @@ async def payment_notify(request: Request):
     email = order_email_map.get(order_no, "無紀錄 Email")
     amt = result.get("PeriodAmt")
 
+    # ✅ 從訂單記憶中找回 Email，若找不到就給預設值
+    email = order_email_map.get(order_no, "unknown@example.com")
+
+    # ✅ 加入 email 到傳送資料中
+    result["PayerEmail"] = email
 
     # ✅ 傳給 Google Apps Script
     try:
-        result["PayerEmail"] = email  # ✅ 加入 email 到結果中
         gsheet_url = "https://script.google.com/macros/s/AKfycbz5OHCQXtugO0wCGSI_ZM-afI3OAcPjWY0xhBvN-7dUSkT-j2yHi90J4jrMbAqWCKQbaQ/exec"
         gsheet_response = requests.post(gsheet_url, json=result)
         print("📤 已送出至 Google Sheets:", gsheet_response.text)
