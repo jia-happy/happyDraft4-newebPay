@@ -71,6 +71,13 @@ def send_email(email, subject, body):
     # yag.send(to="jia@ha-pp-y.com", subject=subject, contents=body)
     yag.send(to=email, subject=subject, contents=body)
 
+
+@app.get("/ping")
+def ping():
+    return {"status": "ok"}
+
+
+
 order_email_map = {}
 
 @app.post("/create-payment")
@@ -190,3 +197,42 @@ async def payment_notify(request: Request):
     send_email(email, f"ha-pp-y™ Kitchen 訂閱通知 - {order_no}", f"您好，\n\n您的訂單 {order_no} 已成功付款 {amt} 元，\n\n感謝您的訂閱！")
 
     return "1|OK"
+
+
+
+
+@app.post("/alter-status")
+def alter_status(order_id: str, period_no: str, action: str):  
+    # action: suspend / terminate / restart
+    payload = {
+        "RespondType": "JSON",
+        "Version": "1.0",
+        "TimeStamp": str(int(time.time())),
+        "MerOrderNo": order_id,
+        "PeriodNo": period_no,
+        "AlterType": action.lower()
+    }
+
+    raw = urllib.parse.urlencode(payload)
+    encrypted = aes_encrypt(raw)
+
+    post_data = {
+        "MerchantID_": MERCHANT_ID,
+        "PostData_": encrypted
+    }
+
+    try:
+        url = "https://ccore.newebpay.com/MPG/period/AlterStatus"  # ✅ 測試環境網址
+        res = requests.post(url, data=post_data)
+        res_data = res.json()
+
+        # 解密回傳
+        if "period" in res_data:
+            decrypted = aes_decrypt(res_data["period"])
+            print("🔓 修改狀態結果:", decrypted)
+            return json.loads(decrypted)
+        else:
+            return {"error": "Missing period data in response"}
+
+    except Exception as e:
+        return {"error": str(e)}
