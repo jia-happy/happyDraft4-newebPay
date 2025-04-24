@@ -249,28 +249,52 @@ async def newebpay_return(request: Request):
     # ✅ 付款成功導回此頁 → 自動轉 GET 頁面
     form = await request.form()
     print("🔁 回傳資料：", dict(form))
-    decrypted = aes_decrypt(form)
-    print("🔁 解密回傳資料：", decrypted)
-
+    
     # 從表單取出訂單編號（如有）
     order_no = form.get("MerchantOrderNo", "")
-    status = form.get("Status", "")
-    print("🔓 ReturnURL 解密 status 結果:", status)
-    period = form.get("Period", "")
+
+    # status = form.get("Status", "")
+    # print("🔓 ReturnURL 解密 status 結果:", status)
+    # period = form.get("Period", "")
     result = "unknown"
     
-    if status == "SUCCESS" and period:
-        decrypted = aes_decrypt(period)
-        print("🔓 ReturnURL 解密結果:", decrypted)
+    # if status == "SUCCESS" and period:
+    #     decrypted = aes_decrypt(period)
+    #     print("🔓 ReturnURL 解密結果:", decrypted)
 
+    #     try:
+    #         data = json.loads(decrypted)
+    #         result = "success"
+    #     except:
+    #         result = "error"
+    # else:
+    #     result = "fail"
+
+    # 處理 Period 欄位 - 假設存在 Period 欄位就嘗試解密
+    period_data = form.get("Period", "")
+    if period_data:
         try:
-            data = json.loads(decrypted)
-            result = "success"
-        except:
+            decrypted_period = aes_decrypt(period_data)
+            print("🔓 ReturnURL 解密 Period 結果:", decrypted_period)
+            
+            try:
+                data = json.loads(decrypted_period)
+                print("✅ 解密成功並解析為 JSON:", data)
+                result = "success"
+                
+                # 從解密的資料中讀取訂單編號（如果存在）
+                if "MerchantOrderNo" in data:
+                    order_no = data["MerchantOrderNo"]
+            except json.JSONDecodeError:
+                print("❌ JSON 解析失敗")
+                result = "error"
+        except Exception as e:
+            print(f"❌ Period 欄位解密失敗: {str(e)}")
             result = "error"
     else:
+        print("❌ 未找到 Period 欄位")
         result = "fail"
-
+        
     # ✅ 導回前端，帶參數
     return RedirectResponse(
         url=f"https://ha-pp-y.kitchen/newebpay-return?status={result}&order={order_no}",
