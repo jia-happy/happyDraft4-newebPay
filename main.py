@@ -280,21 +280,29 @@ async def newebpay_return(request: Request):
             try:
                 data = json.loads(decrypted_period)
                 print("✅ 解密成功並解析為 JSON:", data)
-                result = "success"
+
+                # 檢查 Status 欄位
+                if "Status" in data and data["Status"] == "SUCCESS":
+                    result = "success"
+                else:
+                    result = "fail"
                 
-                # 從解密的資料中讀取訂單編號（如果存在）
-                if "MerchantOrderNo" in data:
-                    order_no = data["MerchantOrderNo"]
+                # 從解密的資料中讀取訂單編號
+                if "Result" in data and "MerchantOrderNo" in data["Result"]:
+                    order_no = data["Result"]["MerchantOrderNo"]
+                else:
+                    print("⚠️ 找不到訂單編號")
+
             except json.JSONDecodeError:
                 print("❌ JSON 解析失敗")
-                result = "error"
+                result = "fail"
         except Exception as e:
             print(f"❌ Period 欄位解密失敗: {str(e)}")
-            result = "error"
+            result = "fail"
     else:
         print("❌ 未找到 Period 欄位")
         result = "fail"
-        
+
     # ✅ 導回前端，帶參數
     return RedirectResponse(
         url=f"https://ha-pp-y.kitchen/newebpay-return?status={result}&order={order_no}",
