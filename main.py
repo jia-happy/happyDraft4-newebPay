@@ -304,7 +304,7 @@ async def newebpay_return(request: Request):
         result = "fail"
 
 
-    redirect_url=f"https://ha-pp-y.kitchen/newebpay-return?status={result}&order={order_no}",
+    redirect_url=f"https://ha-pp-y.kitchen/newebpay-return?status={result}&order={order_no}"
     print(f"🔄 重定向 URL: {redirect_url}")
 
     # ✅ 導回前端，帶參數
