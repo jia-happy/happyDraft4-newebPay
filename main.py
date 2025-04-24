@@ -270,7 +270,7 @@ async def newebpay_return(request: Request):
 
     # ✅ 導回前端，帶參數
     return RedirectResponse(
-        url=f"https://ha-pp-y.kitchen/account?status={result}&order={order_no}",
+        url=f"https://ha-pp-y.kitchen/newebpay-return?status={result}&order={order_no}",
         status_code=303
     )
     
