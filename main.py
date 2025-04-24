@@ -4,6 +4,7 @@ from fastapi.responses import RedirectResponse
 from pydantic import BaseModel
 from Crypto.Cipher import AES
 from datetime import datetime
+import pytz
 import time
 import urllib.parse
 import binascii
@@ -94,8 +95,12 @@ def create_payment(req: PaymentRequest):
     # Step 1: 生成請求字串
     # safe_email = req.email.replace("@", "_at_").replace(".", "_dot_")
 
-    # 獲取當前時間的年月日時分秒
-    date_str = datetime.now().strftime("%Y%m%d%H%M%S")
+    # 設定台北時區
+    taipei_tz = pytz.timezone('Asia/Taipei')
+    # 獲取當前UTC時間並轉換為台北時間
+    taipei_time  = datetime.now(pytz.UTC).astimezone(taipei_tz)
+    # 格式化為年月日時分秒
+    date_str = taipei_time.strftime("%Y%m%d%H%M%S")
     taxId = req.taxId[0:4]
     order_id = f"{date_str}{taxId}"  # 把使用者 ID 放進去
     # payload = {
@@ -179,8 +184,11 @@ async def payment_notify(request: Request):
     print("🔓 解密後內容：", decrypted)
 
     data = json.loads(decrypted)
-    result = data.get("Result", {})
 
+    status = data.get("Status").lower()
+    print("🔓 解密後status：", status)
+
+    result = data.get("Result", {})
     # 👉 根據訂單號碼找 email
     order_no = result.get("MerchantOrderNo")
     # email = order_email_map.get(order_no, "無紀錄 Email")
@@ -192,12 +200,13 @@ async def payment_notify(request: Request):
     company = order.get("company", "未知公司")
 
     # ✅ 加入 email 到傳送資料中
+    result["Status"] = status
     result["PayerEmail"] = email
     result["CompanyName"] = company
 
     # ✅ 傳給 Google Apps Script
     try:
-        gsheet_url = "https://script.google.com/macros/s/AKfycbxJiz4ytGDaa9bi570MdJEALrpmrbD1bnWJVgO5FR1aaguRkDbsKLrPXi_5KxUKkp5Amg/exec"
+        gsheet_url = "https://script.google.com/macros/s/AKfycbyKFjlUVnjnS08trsuzw3BooKZYe-jI25JXv-XyQgiFiVHWPCQWLpUrtCQXPCqDJYgDHw/exec"
         gsheet_response = requests.post(gsheet_url, json=result)
         print("📤 已送出至 Google Sheets:", gsheet_response.text)
     except Exception as e:
