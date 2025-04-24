@@ -303,9 +303,13 @@ async def newebpay_return(request: Request):
         print("❌ 未找到 Period 欄位")
         result = "fail"
 
+
+    redirect_url=f"https://ha-pp-y.kitchen/newebpay-return?status={result}&order={order_no}",
+    print(f"🔄 重定向 URL: {redirect_url}")
+
     # ✅ 導回前端，帶參數
     return RedirectResponse(
-        url=f"https://ha-pp-y.kitchen/newebpay-return?status={result}&order={order_no}",
+        url=redirect_url,
         status_code=303
     )
     
