@@ -249,6 +249,8 @@ async def newebpay_return(request: Request):
     # ✅ 付款成功導回此頁 → 自動轉 GET 頁面
     form = await request.form()
     print("🔁 回傳資料：", dict(form))
+    decrypted = aes_decrypt(form)
+    print("🔁 解密回傳資料：", decrypted)
 
     # 從表單取出訂單編號（如有）
     order_no = form.get("MerchantOrderNo", "")
