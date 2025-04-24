@@ -3,7 +3,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
 from pydantic import BaseModel
 from Crypto.Cipher import AES
-from flask import Flask, request
 import time
 import urllib.parse
 import binascii
@@ -246,7 +245,7 @@ def alter_status(order_id: str, period_no: str, action: str):
 
 
 @app.post("/newebpay-return")
-async def newebpay_return():
+async def newebpay_return(request: Request):
     # ✅ 付款成功導回此頁 → 自動轉 GET 頁面
     form = await request.form()
     print("🔁 回傳資料：", dict(form))
