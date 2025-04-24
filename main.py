@@ -253,6 +253,7 @@ async def newebpay_return(request: Request):
     # 從表單取出訂單編號（如有）
     order_no = form.get("MerchantOrderNo", "")
     status = form.get("Status", "")
+    print("🔓 ReturnURL 解密 status 結果:", status)
     period = form.get("Period", "")
     result = "unknown"
     
