@@ -87,10 +87,6 @@ order_email_map = {}
 @app.post("/create-payment")
 def create_payment(req: PaymentRequest):
     timeStamp = str(int(time.time()))
-    order_email_map[timeStamp] = {
-        "email": req.email,
-        "company": req.companyName
-    }  # ✅ 儲存 Email
 
     # Step 1: 生成請求字串
     # safe_email = req.email.replace("@", "_at_").replace(".", "_dot_")
@@ -103,6 +99,10 @@ def create_payment(req: PaymentRequest):
     date_str = taipei_time.strftime("%Y%m%d%H%M%S")
     taxId = req.taxId[0:4]
     order_id = f"{date_str}{taxId}"  # 把使用者 ID 放進去
+    order_email_map[order_id] = {
+        "email": req.email,
+        "company": req.companyName
+    }  # ✅ 儲存 Email
     # payload = {
     #     "MerchantID": MERCHANT_ID,
     #     "RespondType": "JSON",
