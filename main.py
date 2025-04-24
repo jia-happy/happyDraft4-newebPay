@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
 from pydantic import BaseModel
 from Crypto.Cipher import AES
+from datetime import datetime
 import time
 import urllib.parse
 import binascii
@@ -34,6 +35,7 @@ class PaymentRequest(BaseModel):
     email: str
     amount: int
     companyName: str
+    taxId: str
     # order_id: str
 
 def pad(data: str):
@@ -91,7 +93,11 @@ def create_payment(req: PaymentRequest):
 
     # Step 1: 生成請求字串
     # safe_email = req.email.replace("@", "_at_").replace(".", "_dot_")
-    # order_id = f"ORDER_{int(time.time())}_{safe_email}"  # 把使用者 ID 放進去
+
+    # 獲取當前時間的年月日時分秒
+    date_str = datetime.now().strftime("%Y%m%d%H%M%S")
+    taxId = req.taxId[0:4]
+    order_id = f"{date_str}{taxId}"  # 把使用者 ID 放進去
     # payload = {
     #     "MerchantID": MERCHANT_ID,
     #     "RespondType": "JSON",
@@ -113,7 +119,7 @@ def create_payment(req: PaymentRequest):
         "TimeStamp": timeStamp,
         "Version": "1.5",
         "LangType": "zh-Tw",
-        "MerOrderNo": timeStamp,
+        "MerOrderNo": order_id,
         "ProdDesc": "訂閱方案",
         "PeriodAmt": str(req.amount),
         "PeriodType": "M",
