@@ -91,6 +91,14 @@ async def get_ip(request: Request):
     # {"ip":"111.243.102.121"}
     return {"ip": ip}
 
+@app.get("/my-egress-ip")
+def get_my_egress_ip():
+    try:
+        ip = requests.get("https://api.ipify.org").text
+        # https://happydraft4-newebpay.onrender.com/my-egress-ip
+        return {"egress_ip": ip}
+    except Exception as e:
+        return {"error": str(e)}
 
 order_email_map = {}
 
@@ -281,7 +289,12 @@ def alter_status(req: AlterStatusRequest):
         url = "https://ccore.newebpay.com/MPG/period/AlterStatus"  # ✅ 測試環境網址
         res = requests.post(url, data=post_data)
         print("🧾 藍新原始回傳:", res.text)
-        res_data = res.json()
+        try:
+            res_data = res.json()
+        except Exception:
+            print("❌ 回傳不是 JSON，內容如下：")
+            print(res.text)
+            return {"error": "Non-JSON response", "raw": res.text}
 
         # 解密回傳
         if "period" in res_data:
