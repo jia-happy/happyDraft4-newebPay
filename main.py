@@ -256,6 +256,7 @@ def alter_status(req: AlterStatusRequest):
     try:
         url = "https://ccore.newebpay.com/MPG/period/AlterStatus"  # ✅ 測試環境網址
         res = requests.post(url, data=post_data)
+        print("🧾 藍新原始回傳:", res.text)
         res_data = res.json()
 
         # 解密回傳
@@ -264,9 +265,11 @@ def alter_status(req: AlterStatusRequest):
             print("🔓 修改狀態結果:", decrypted)
             return json.loads(decrypted)
         else:
+            print("⚠️ 未包含 period 欄位:", res_data)
             return {"error": "Missing period data in response"}
 
     except Exception as e:
+        print("🔥 發生例外:", str(e))
         return {"error": str(e)}
 
 
