@@ -189,6 +189,13 @@ async def payment_notify(request: Request):
     print("🔓 解密後status：", status)
 
     result = data.get("Result", {})
+
+    gsheet_data = {
+        "Status": status,                      # ✅ 主狀態
+        "Message": data.get("Message", ""),    # ✅ 說明文字
+        "Result": result                       # ✅ 內部交易欄位（你已解密）
+    }
+
     # 👉 根據訂單號碼找 email
     order_no = result.get("MerchantOrderNo")
     # email = order_email_map.get(order_no, "無紀錄 Email")
@@ -196,18 +203,18 @@ async def payment_notify(request: Request):
 
     # ✅ 從訂單記憶中找回 Email，若找不到就給預設值
     order = order_email_map.get(order_no, {})
-    email = order.get("email", "unknown@example.com")
-    company = order.get("company", "未知公司")
+    email = order.get("email", "")
+    company = order.get("company", "")
 
     # ✅ 加入 email 到傳送資料中
-    result["Status"] = status
+    # result["Status"] = status
     result["PayerEmail"] = email
     result["CompanyName"] = company
 
     # ✅ 傳給 Google Apps Script
     try:
-        gsheet_url = "https://script.google.com/macros/s/AKfycbyKFjlUVnjnS08trsuzw3BooKZYe-jI25JXv-XyQgiFiVHWPCQWLpUrtCQXPCqDJYgDHw/exec"
-        gsheet_response = requests.post(gsheet_url, json=result)
+        gsheet_url = "https://script.google.com/macros/s/AKfycbwWvKB_w0_a7ZYMyjAF1EsPFI1TT9RTWEUSpWDTNQTk5GHOB6jRvop10c8-7sezaeDv3Q/exec"
+        gsheet_response = requests.post(gsheet_url, json=gsheet_data)
         print("📤 已送出至 Google Sheets:", gsheet_response.text)
     except Exception as e:
         print("⚠️ 發送 Google Sheets 失敗:", str(e))
