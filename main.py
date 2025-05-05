@@ -13,6 +13,7 @@ import requests
 import json
 import yagmail
 import hashlib
+import requests
 
 app = FastAPI()
 
@@ -86,6 +87,8 @@ def ping():
 async def get_ip(request: Request):
     ip = request.client.host
     print(f"🌐 Client IP: {ip}")
+    # https://happydraft4-newebpay.onrender.com/ip
+    # {"ip":"111.243.102.121"}
     return {"ip": ip}
 
 
@@ -242,7 +245,9 @@ class AlterStatusRequest(BaseModel):
 @app.post("/alter-status")
 def alter_status(req: AlterStatusRequest):  
     # action: suspend / terminate / restart
-    print("收到 POST /alter-status 請求")
+    print("📮 收到 POST /alter-status 請求")
+
+    # ✅ Step 1: 準備 payload
     payload = {
         "RespondType": "JSON",
         "Version": "1.0",
@@ -252,12 +257,17 @@ def alter_status(req: AlterStatusRequest):
         "AlterType": req.action.lower()
     }
 
+    # ✅ Step 2: 加密 payload
     raw = urllib.parse.urlencode(payload)
     encrypted = aes_encrypt(raw)
 
+    # ✅ Step 3: 建立簽章 CheckValue
+    check_value = generate_check_value(payload, HASH_KEY, HASH_IV)
+
     post_data = {
         "MerchantID_": MERCHANT_ID,
-        "PostData_": encrypted
+        "PostData_": encrypted,
+        "CheckValue": check_value
     }
 
     try:
