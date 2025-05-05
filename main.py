@@ -235,6 +235,7 @@ class AlterStatusRequest(BaseModel):
 @app.post("/alter-status")
 def alter_status(req: AlterStatusRequest):  
     # action: suspend / terminate / restart
+    print("收到 POST /alter-status 請求")
     payload = {
         "RespondType": "JSON",
         "Version": "1.0",
