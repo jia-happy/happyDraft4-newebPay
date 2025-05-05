@@ -226,17 +226,22 @@ async def payment_notify(request: Request):
 
 
 
+class AlterStatusRequest(BaseModel):
+    order_id: str
+    period_no: str
+    action: str
+
 
 @app.post("/alter-status")
-def alter_status(order_id: str, period_no: str, action: str):  
+def alter_status(req: AlterStatusRequest):  
     # action: suspend / terminate / restart
     payload = {
         "RespondType": "JSON",
         "Version": "1.0",
         "TimeStamp": str(int(time.time())),
-        "MerOrderNo": order_id,
-        "PeriodNo": period_no,
-        "AlterType": action.lower()
+        "MerOrderNo": req.order_id,
+        "PeriodNo": req.period_no,
+        "AlterType": req.action.lower()
     }
 
     raw = urllib.parse.urlencode(payload)
