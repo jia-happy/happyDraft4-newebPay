@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
+from fastapi.requests import Request
 from pydantic import BaseModel
 from Crypto.Cipher import AES
 from datetime import datetime
@@ -80,6 +81,12 @@ def send_email(email, subject, body):
 def ping():
     return {"status": "ok"}
 
+
+@app.get("/ip")
+async def get_ip(request: Request):
+    ip = request.client.host
+    print(f"🌐 Client IP: {ip}")
+    return {"ip": ip}
 
 
 order_email_map = {}
