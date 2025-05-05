@@ -235,6 +235,13 @@ async def payment_notify(request: Request):
     return "1|OK"
 
 
+def generate_check_value(params: dict, hash_key: str, hash_iv: str) -> str:
+    sorted_items = sorted(params.items())
+    encoded_str = f"HashKey={hash_key}&" + urllib.parse.urlencode(sorted_items) + f"&HashIV={hash_iv}"
+    encoded_str = encoded_str.lower()  # 根據藍新需全部轉小寫
+    sha256 = hashlib.sha256()
+    sha256.update(encoded_str.encode('utf-8'))
+    return sha256.hexdigest().upper()
 
 class AlterStatusRequest(BaseModel):
     order_id: str
