@@ -89,6 +89,9 @@ async def get_ip(request: Request):
     print(f"🌐 Client IP: {ip}")
     # https://happydraft4-newebpay.onrender.com/ip
     # {"ip":"111.243.102.121"}
+    # {"ip":"111.243.89.57"} # 5/6 本機對外網路 public ip
+
+    # https://api.ipify.org/
     return {"ip": ip}
 
 @app.get("/my-egress-ip")
@@ -96,6 +99,7 @@ def get_my_egress_ip():
     try:
         ip = requests.get("https://api.ipify.org").text
         # https://happydraft4-newebpay.onrender.com/my-egress-ip
+        # {"egress_ip":"34.211.200.85"}
         return {"egress_ip": ip}
     except Exception as e:
         return {"error": str(e)}
@@ -231,7 +235,7 @@ async def payment_notify(request: Request):
 
     # ✅ 傳給 Google Apps Script
     try:
-        gsheet_url = "https://script.google.com/macros/s/AKfycbxM3hk3USHSUPiyQst9GPVKWi3fDwFIkOcH07dJHZ6DA4yW7e99YpkfqsYFlMSmWNwAkA/exec"
+        gsheet_url = "https://script.google.com/macros/s/AKfycbzEh0d0SMN9q4nH8uzynp-QO5BsVgsq995_3-_qHdgIJPNKJFBjLBbimfAmCR_fpa_VNQ/exec"
         gsheet_response = requests.post(gsheet_url, json=gsheet_data)
         print("📤 已送出至 Google Sheets:", gsheet_response.text)
     except Exception as e:
@@ -255,7 +259,6 @@ class AlterStatusRequest(BaseModel):
     order_id: str
     period_no: str
     action: str
-
 
 @app.post("/alter-status")
 def alter_status(req: AlterStatusRequest):  
@@ -382,3 +385,115 @@ async def newebpay_return(request: Request):
     )
     
     # return RedirectResponse(url="https://ha-pp-y.kitchen/account", status_code=303)
+
+
+
+
+
+# Linode proxy_main.py
+
+# from fastapi import FastAPI
+# import requests, urllib.parse, time
+# from pydantic import BaseModel
+# from Crypto.Cipher import AES
+# import json
+# import binascii
+
+# app = FastAPI()
+
+# HASH_KEY = "iypgxuabOx2fjI8zhSua1y4PQX0iU3WL"
+# HASH_IV = "CpgkDEc5fUm9tt4P"
+# MERCHANT_ID = "MS355719396"
+
+# class AlterStatusRequest(BaseModel):
+#     order_id: str
+#     period_no: str
+#     action: str
+
+# def pad(data: str):
+#     pad_len = 32 - (len(data.encode('utf-8')) % 32)
+#     return data + chr(pad_len) * pad_len
+
+# def strip_padding(data: bytes) -> str:
+#     """移除 PKCS7 Padding"""
+#     padding_len = data[-1]
+#     return data[:-padding_len].decode("utf-8")
+
+# def aes_encrypt(data: str):
+#     cipher = AES.new(HASH_KEY.encode('utf-8'), AES.MODE_CBC, HASH_IV.encode('utf-8'))
+#     encrypted = cipher.encrypt(pad(data).encode('utf-8'))
+#     return binascii.hexlify(encrypted).decode('utf-8')
+
+# def aes_decrypt(encrypted_hex: str) -> str:
+#     try:
+#         # 將 hex 轉換為 bytes
+#         encrypted_bytes = binascii.unhexlify(encrypted_hex)
+        
+#         # 建立 AES 解密器（使用 CBC 模式）
+#         cipher = AES.new(HASH_KEY.encode('utf-8'), AES.MODE_CBC, HASH_IV.encode('utf-8'))
+        
+#         # 解密並去除 padding
+#         decrypted_bytes = cipher.decrypt(encrypted_bytes)
+#         decrypted_text = strip_padding(decrypted_bytes)
+
+#         return decrypted_text
+#     except Exception as e:
+#         print("❌ 解密失敗：", str(e))
+#         return "Decryption failed"
+
+
+# @app.post("/alter-status")
+# def proxy_alter_status(req: AlterStatusRequest):
+#     print("📮 收到 POST /alter-status 請求")
+#     payload = {
+#         "RespondType": "JSON",
+#         "Version": "1.0",
+#         "TimeStamp": str(int(time.time())),
+#         "MerOrderNo": req.order_id,
+#         "PeriodNo": req.period_no,
+#         "AlterType": req.action.lower()
+#     }
+#     print("📮 請求內容:", payload)
+
+#     raw = urllib.parse.urlencode(payload)
+#     encrypted = aes_encrypt(raw)  # 替換成你的加密函式
+#     print("🔐 加密後:", encrypted)
+
+#     post_data = {
+#         "MerchantID_": MERCHANT_ID,
+#         "PostData_": encrypted
+#     }
+
+#     try:
+#         res = requests.post("https://core.newebpay.com/MPG/period/AlterStatus", data=post_data)
+#         print("🧾 藍新原始回傳:", res.text)
+
+#         try:
+#             res_data = res.json()
+#         except Exception:
+#             print("❌ 回傳不是 JSON，內容如下：")
+#             print(res.text)
+#             return {"error": "Non-JSON response", "raw": res.text}
+
+#         # 解密回傳
+#         if "period" in res_data:
+#             decrypted = aes_decrypt(res_data["period"])
+#             print("🔓 修改狀態結果:", decrypted)
+            # # 將解密後的資料轉為字典
+            # result = json.loads(decrypted)
+            # # ✅ 傳送到 Google Sheets（Apps Script URL）
+            # try:
+            #     gsheet_url = "https://script.google.com/macros/s/AKfycbzEh0d0SMN9q4nH8uzynp-QO5BsVgsq995_3-_qHdgIJPNKJFBjLBbimfAmCR_fpa_VNQ/exec"
+            #     gsheet_response = requests.post(gsheet_url, json=result)
+            #     print("📤 已送出至 Google Sheets:", gsheet_response.text)
+            # except Exception as e:
+            #     print("⚠️ 發送 Google Sheets 失敗:", str(e))
+#             return result
+
+#         else:
+#             print("⚠️ 未包含 period 欄位:", res_data)
+#             return {"error": "Missing period data in response"}
+#         # return {"status": res.status_code, "result": res.text}
+#     except Exception as e:
+#         print("🔥 發生例外:", str(e))
+#         return {"error": str(e)}
