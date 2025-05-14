@@ -398,8 +398,22 @@ async def newebpay_return(request: Request):
 # from Crypto.Cipher import AES
 # import json
 # import binascii
+# from fastapi.middleware.cors import CORSMiddleware
 
 # app = FastAPI()
+
+# # ✅ 加上這段 CORS 設定
+# app.add_middleware(
+#     CORSMiddleware,
+#     allow_origins=[
+#     "https://framer.com",
+#     "https://*.framercanvas.com",
+#     "https://ha-pp-y.kitchen"
+#     ],  # 或改成只允許 Framer 的網址，如 "https://framer.com"
+#     allow_credentials=True,
+#     allow_methods=["*"],
+#     allow_headers=["*"],
+# )
 
 # HASH_KEY = "iypgxuabOx2fjI8zhSua1y4PQX0iU3WL"
 # HASH_IV = "CpgkDEc5fUm9tt4P"
@@ -465,7 +479,7 @@ async def newebpay_return(request: Request):
 #     }
 
 #     try:
-#         res = requests.post("https://core.newebpay.com/MPG/period/AlterStatus", data=post_data)
+#         res = requests.post("https://ccore.newebpay.com/MPG/period/AlterStatus", data=post_data)
 #         print("🧾 藍新原始回傳:", res.text)
 
 #         try:
@@ -479,15 +493,15 @@ async def newebpay_return(request: Request):
 #         if "period" in res_data:
 #             decrypted = aes_decrypt(res_data["period"])
 #             print("🔓 修改狀態結果:", decrypted)
-            # # 將解密後的資料轉為字典
-            # result = json.loads(decrypted)
-            # # ✅ 傳送到 Google Sheets（Apps Script URL）
-            # try:
-            #     gsheet_url = "https://script.google.com/macros/s/AKfycbzEh0d0SMN9q4nH8uzynp-QO5BsVgsq995_3-_qHdgIJPNKJFBjLBbimfAmCR_fpa_VNQ/exec"
-            #     gsheet_response = requests.post(gsheet_url, json=result)
-            #     print("📤 已送出至 Google Sheets:", gsheet_response.text)
-            # except Exception as e:
-            #     print("⚠️ 發送 Google Sheets 失敗:", str(e))
+#             # 將解密後的資料轉為字典
+#             result = json.loads(decrypted)
+#             # ✅ 傳送到 Google Sheets（Apps Script URL）
+#             try:
+#                 gsheet_url = "https://script.google.com/macros/s/AKfycbzjcY3D5F5kUv2gk7EiEonlbayq7l1_P1RvSarxXXRJBT8I5ape_TfqIe933ZdEl7xWRw/exec"
+#                 gsheet_response = requests.post(gsheet_url, json=result)
+#                 print("📤 已送出至 Google Sheets:", gsheet_response.text)
+#             except Exception as e:
+#                 print("⚠️ 發送 Google Sheets 失敗:", str(e))
 #             return result
 
 #         else:
@@ -497,3 +511,52 @@ async def newebpay_return(request: Request):
 #     except Exception as e:
 #         print("🔥 發生例外:", str(e))
 #         return {"error": str(e)}
+
+# 修改狀態結果: {"Status":"PER10074","Message":"\u672cAPI\u9650\u5be9\u6838\u5f8c\u4f7f\u7528\uff0c\u5982\u9700\u4f7f\u7528\u8acb\u6d3d\u5ba2\u670d\u4eba\u54e1","Result":{"Version":"1.0","TimeStamp":"1747217829","MerOrderNo":"202505051256529025","PeriodNo":"P250505125718IMUM5i","RespondType":"JSON","AlterType":"suspend"}}
+
+
+
+
+
+
+
+
+
+
+
+# 取得 SSL 憑證後
+# server {
+#     listen 443 ssl;
+#     server_name api.ha-pp-y.kitchen;  # ✅ 改成你自己的網域或 Public IP
+
+#     ssl_certificate /etc/letsencrypt/live/api.ha-pp-y.kitchen/fullchain.pem;       # 🔁 用 Let's Encrypt 憑證或自簽
+#     ssl_certificate_key /etc/letsencrypt/live/api.ha-pp-y.kitchen/privkey.pem;
+
+#     location / {
+#         proxy_pass http://127.0.0.1:3000;
+#         proxy_set_header Host $host;
+#         proxy_set_header X-Real-IP $remote_addr;
+#     }
+# }
+
+# # Optional HTTP redirect
+# server {
+#     listen 80;
+#     server_name api.ha-pp-y.kitchen;
+
+#     return 301 https://$host$request_uri;
+# }
+
+
+# 取得 SSL 憑證前
+# server {
+#     listen 80;
+#     server_name ha-pp-y.kitchen;
+
+#     root /var/www/html;
+#     index index.html;
+
+#     location / {
+#         try_files $uri $uri/ =404;
+#     }
+# }
