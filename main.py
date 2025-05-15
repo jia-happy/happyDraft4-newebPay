@@ -235,7 +235,7 @@ async def payment_notify(request: Request):
 
     # ✅ 傳給 Google Apps Script
     try:
-        gsheet_url = "https://script.google.com/macros/s/AKfycbzEh0d0SMN9q4nH8uzynp-QO5BsVgsq995_3-_qHdgIJPNKJFBjLBbimfAmCR_fpa_VNQ/exec"
+        gsheet_url = "https://script.google.com/macros/s/AKfycbzdlrJ3OS_Ao6CjjBfNZwgWLYVnoy4piCTGQWLBcVKByZtFXEhyhRJOn0FR0KP8ZoV3Ew/exec"
         gsheet_response = requests.post(gsheet_url, json=gsheet_data)
         print("📤 已送出至 Google Sheets:", gsheet_response.text)
     except Exception as e:
@@ -497,7 +497,7 @@ async def newebpay_return(request: Request):
 #             result = json.loads(decrypted)
 #             # ✅ 傳送到 Google Sheets（Apps Script URL）
 #             try:
-#                 gsheet_url = "https://script.google.com/macros/s/AKfycbzjcY3D5F5kUv2gk7EiEonlbayq7l1_P1RvSarxXXRJBT8I5ape_TfqIe933ZdEl7xWRw/exec"
+#                 gsheet_url = "https://script.google.com/macros/s/AKfycbzdlrJ3OS_Ao6CjjBfNZwgWLYVnoy4piCTGQWLBcVKByZtFXEhyhRJOn0FR0KP8ZoV3Ew/exec"
 #                 gsheet_response = requests.post(gsheet_url, json=result)
 #                 print("📤 已送出至 Google Sheets:", gsheet_response.text)
 #             except Exception as e:
