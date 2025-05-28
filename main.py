@@ -31,10 +31,15 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# 正式用密鑰
+HASH_KEY = "OKEaRtuSXR9pKozzvj4Fq3EYNc8W92jj"
+HASH_IV = "PSqcgIiqkWrLmppC"
+MERCHANT_ID = "MS3780269062"
+
 # 測試用密鑰（請換成實際值）
-HASH_KEY = "iypgxuabOx2fjI8zhSua1y4PQX0iU3WL"
-HASH_IV = "CpgkDEc5fUm9tt4P"
-MERCHANT_ID = "MS355719396"
+# HASH_KEY = "iypgxuabOx2fjI8zhSua1y4PQX0iU3WL"
+# HASH_IV = "CpgkDEc5fUm9tt4P"
+# MERCHANT_ID = "MS355719396"
 
 class PaymentRequest(BaseModel):
     email: str
