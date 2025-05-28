@@ -80,7 +80,7 @@ def aes_decrypt(encrypted_hex: str) -> str:
         return "Decryption failed"
 
 def send_email(email, subject, body):
-    yag = yagmail.SMTP("happy.it.engineer@gmail.com", "kvxxurwgcihmsqca")  # 建議開啟 2FA
+    yag = yagmail.SMTP("ha-pp-y™ Co. 通知系統 <happy.it.engineer@gmail.com>", "kvxxurwgcihmsqca")  # 建議開啟 2FA
     # yag.send(to="jia@ha-pp-y.com", subject=subject, contents=body)
     yag.send(to=email, subject=subject, contents=body)
 
@@ -249,7 +249,18 @@ async def payment_notify(request: Request):
         print("⚠️ 發送 Google Sheets 失敗:", str(e))
     
     print("✉️ 收到付款通知email寄出")
-    send_email(email, f"ha-pp-y™ Kitchen 訂閱通知 - {order_no}", f"您好，\n\n您的訂閱編號 {order_no} 已成功付款 {amt} 元，\n\n感謝您的訂閱！\n\n本信件由系統自動發送，請勿直接回覆。")
+    contents = [
+        "您好，",
+        "<br><br>",
+        f"您的訂閱編號 {order_no} 已成功付款 {amt} 元，",
+        "<br><br>",
+        "感謝您的訂閱！",
+        "<br><br>",
+        "本信件由系統自動發送，請勿直接回覆。",
+        "<br><br>",
+        "ha-pp-y™ Co."
+    ]
+    send_email(email, f"ha-pp-y™ Kitchen 訂閱成功 - {order_no}", contents)
 
     return "1|OK"
 
