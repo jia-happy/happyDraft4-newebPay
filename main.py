@@ -185,7 +185,7 @@ def create_payment(req: PaymentRequest):
     return {
         "MerchantID_": MERCHANT_ID,
         "PostData_": encrypted,
-        "ActionURL": "https://ccore.newebpay.com/MPG/period"
+        "ActionURL": "https://core.newebpay.com/MPG/period"
     }
 
 # Step4: 結果
@@ -242,7 +242,7 @@ async def payment_notify(request: Request):
         print("⚠️ 發送 Google Sheets 失敗:", str(e))
     
     print("✉️ 收到付款通知email寄出")
-    send_email(email, f"ha-pp-y™ Kitchen 訂閱通知 - {order_no}", f"您好，\n\n您的訂單 {order_no} 已成功付款 {amt} 元，\n\n感謝您的訂閱！")
+    send_email(email, f"ha-pp-y™ Kitchen 訂閱通知 - {order_no}", f"您好，\n\n您的訂閱編號 {order_no} 已成功付款 {amt} 元，\n\n感謝您的訂閱！\n\n本信件由系統自動發送，請勿直接回覆。")
 
     return "1|OK"
 
@@ -289,7 +289,7 @@ def alter_status(req: AlterStatusRequest):
     }
 
     try:
-        url = "https://ccore.newebpay.com/MPG/period/AlterStatus"  # ✅ 測試環境網址
+        url = "https://core.newebpay.com/MPG/period/AlterStatus"  # ✅ 測試環境網址
         res = requests.post(url, data=post_data)
         print("🧾 藍新原始回傳:", res.text)
         try:
@@ -479,7 +479,7 @@ async def newebpay_return(request: Request):
 #     }
 
 #     try:
-#         res = requests.post("https://ccore.newebpay.com/MPG/period/AlterStatus", data=post_data)
+#         res = requests.post("https://core.newebpay.com/MPG/period/AlterStatus", data=post_data)
 #         print("🧾 藍新原始回傳:", res.text)
 
 #         try:
