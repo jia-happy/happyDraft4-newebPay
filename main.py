@@ -22,8 +22,8 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "https://framer.com",
-        "https://*.framercanvas.com",
-        "https://ha-pp-y.kitchen/",  # 改成你的 Framer 網域
+        # "https://*.framercanvas.com",
+        "https://ha-pp-y.kitchen",  # 改成你的 Framer 網域
     ],
     # allow_origins=["*"], # 測試開發中可以先允許所有網域
     allow_credentials=True,
