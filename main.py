@@ -80,7 +80,7 @@ def aes_decrypt(encrypted_hex: str) -> str:
         return "Decryption failed"
 
 def send_email(email, subject, body):
-    yag = yagmail.SMTP("ha-pp-y™ Co. 通知系統 <happy.it.engineer@gmail.com>", "kvxxurwgcihmsqca")  # 建議開啟 2FA
+    yag = yagmail.SMTP("happy.it.engineer@gmail.com", "kvxxurwgcihmsqca")  # 建議開啟 2FA
     # yag.send(to="jia@ha-pp-y.com", subject=subject, contents=body)
     yag.send(to=email, subject=subject, contents=body)
 
@@ -425,7 +425,7 @@ async def newebpay_return(request: Request):
 #     CORSMiddleware,
 #     allow_origins=[
 #     "https://framer.com",
-#     "https://*.framercanvas.com",
+##     "https://*.framercanvas.com",
 #     "https://ha-pp-y.kitchen"
 #     ],  # 或改成只允許 Framer 的網址，如 "https://framer.com"
 #     allow_credentials=True,
@@ -433,6 +433,12 @@ async def newebpay_return(request: Request):
 #     allow_headers=["*"],
 # )
 
+# 正式用密鑰
+# HASH_KEY = "OKEaRtuSXR9pKozzvj4Fq3EYNc8W92jj"
+# HASH_IV = "PSqcgIiqkWrLmppC"
+# MERCHANT_ID = "MS3780269062"
+
+# 測試用密鑰（請換成實際值）
 # HASH_KEY = "iypgxuabOx2fjI8zhSua1y4PQX0iU3WL"
 # HASH_IV = "CpgkDEc5fUm9tt4P"
 # MERCHANT_ID = "MS355719396"
