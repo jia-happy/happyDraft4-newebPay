@@ -32,14 +32,14 @@ app.add_middleware(
 )
 
 # 正式用密鑰
-HASH_KEY = "OKEaRtuSXR9pKozzvj4Fq3EYNc8W92jj"
-HASH_IV = "PSqcgIiqkWrLmppC"
-MERCHANT_ID = "MS3780269062"
+# HASH_KEY = "OKEaRtuSXR9pKozzvj4Fq3EYNc8W92jj"
+# HASH_IV = "PSqcgIiqkWrLmppC"
+# MERCHANT_ID = "MS3780269062"
 
 # 測試用密鑰（請換成實際值）
-# HASH_KEY = "iypgxuabOx2fjI8zhSua1y4PQX0iU3WL"
-# HASH_IV = "CpgkDEc5fUm9tt4P"
-# MERCHANT_ID = "MS355719396"
+HASH_KEY = "iypgxuabOx2fjI8zhSua1y4PQX0iU3WL"
+HASH_IV = "CpgkDEc5fUm9tt4P"
+MERCHANT_ID = "MS355719396"
 
 class PaymentRequest(BaseModel):
     email: str
@@ -192,7 +192,7 @@ def create_payment(req: PaymentRequest):
     return {
         "MerchantID_": MERCHANT_ID,
         "PostData_": encrypted,
-        "ActionURL": "https://core.newebpay.com/MPG/period"
+        "ActionURL": "https://ccore.newebpay.com/MPG/period"
     }
 
 # Step4: 結果
@@ -307,7 +307,7 @@ def alter_status(req: AlterStatusRequest):
     }
 
     try:
-        url = "https://core.newebpay.com/MPG/period/AlterStatus"  # ✅ 測試環境網址
+        url = "https://ccore.newebpay.com/MPG/period/AlterStatus"  # ✅ 測試環境網址
         res = requests.post(url, data=post_data)
         print("🧾 藍新原始回傳:", res.text)
         try:
