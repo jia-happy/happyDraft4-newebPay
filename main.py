@@ -248,15 +248,18 @@ async def payment_notify(request: Request):
     except Exception as e:
         print("⚠️ 發送 Google Sheets 失敗:", str(e))
     
-    if status == "success":
+    if email and status == "success":
         print("✉️ 收到付款通知email寄出")
-        contents = f"""
+
+        import textwrap
+        contents = textwrap.dedent(f"""\
             您好，<br>
             您的訂閱編號 {order_no} 已成功付款 {amt} 元，<br>
             感謝您的訂閱！<br><br>
             本信件由系統自動發送，請勿直接回覆。<br>
             ha-pp-y™ Co.
-        """
+        """)
+        
         send_email(email, f"ha-pp-y™ Kitchen 訂閱成功 - {order_no}", contents)
 
     return "1|OK"
