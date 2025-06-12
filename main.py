@@ -408,6 +408,125 @@ async def newebpay_return(request: Request):
 
 
 
+
+
+from fastapi import FastAPI, Request
+from pydantic import BaseModel, EmailStr, constr
+from fastapi.responses import JSONResponse
+from typing import Literal, Optional
+from urllib.parse import quote_plus
+from Crypto.Cipher import AES
+from Crypto.Util.Padding import pad
+import base64
+import httpx
+import os
+from pydantic import Field
+from datetime import datetime, timezone
+
+# app = FastAPI()
+
+class InvoiceRequest(BaseModel):
+    merchantOrderNo: str
+    invoiceType: Literal['B2C', 'B2B']
+    buyerName: Optional[str] = ''
+    # buyerUBN: Optional[constr(regex=r'^\d{8}$')] = ''
+    buyerUBN: Optional[str] = Field(default='', regex=r'^\d{8}$')
+    email: EmailStr
+    carrierType: Literal['', '1', '2']
+    carrierNum: Optional[str] = ''
+    donate: bool = False
+    # loveCode: Optional[constr(regex=r'^\d{3,7}$')] = ''
+    loveCode: Optional[str] = Field(default='', regex=r'^\d{3,7}$')
+    printFlag: bool = False
+    address: Optional[str] = ''
+    itemPrice: int
+    itemAmt: int
+
+def aes_encrypt(data: str, key: str, iv: str) -> str:
+    cipher = AES.new(key.encode('utf-8'), AES.MODE_CBC, iv.encode('utf-8'))
+    padded = pad(data.encode('utf-8'), AES.block_size)
+    encrypted = cipher.encrypt(padded)
+    return base64.b64encode(encrypted).decode('utf-8')
+
+@app.post("/api/invoice/issue")
+async def issue_invoice(payload: InvoiceRequest):
+    # MERCHANT_ID = os.getenv("EZP_MERCHANT_ID", "MS12345678")
+    # HASH_KEY = os.getenv("EZP_HASH_KEY", "12345678901234567890123456789012")
+    # HASH_IV = os.getenv("EZP_HASH_IV", "1234567890123456")
+
+    MERCHANT_ID = "38090916"
+    HASH_KEY = "qvEx2bToikTCD7Ia8D7bj8DyztGYFN7z"
+    HASH_IV = "CqTeD1XWPVikNmUP"
+
+    carrier_num_encoded = quote_plus(payload.carrierNum.strip()) if payload.carrierNum else ''
+
+    now = int(datetime.now(timezone.utc).timestamp())
+    is_b2b = payload.invoiceType == "B2B"
+
+    post_data = {
+        "MerchantID": MERCHANT_ID,
+        "RespondType": "JSON",
+        "Version": "1.5",
+        "TimeStamp": str(now),
+        "MerchantOrderNo": payload.merchantOrderNo,
+        "Status": "1",
+        "Category": payload.invoiceType,
+        "BuyerName": payload.buyerName,
+        "BuyerUBN": payload.buyerUBN,
+        "BuyerEmail": payload.email,
+        "CarrierType": payload.carrierType,
+        "CarrierNum": carrier_num_encoded,
+        "LoveCode": payload.loveCode,
+        "PrintFlag": "Y" if payload.printFlag else "N",
+
+        "TaxType": "1", # 應稅
+        "TaxRate": 5, # 一般稅率/特種稅率？
+        "Amt": 100, # 發票銷售額(未稅)
+        "TaxAmt": 5, # 發票稅額
+        "TotalAmt": 56614, # 發票總金額(含稅)
+
+        "ItemName": "ha-pp-y™ Kitchen 訂閱",
+        "ItemCount": "1",
+        "ItemUnit": "月",
+        "ItemPrice": payload.itemPrice,
+        "ItemAmt": payload.itemAmt,
+        "Comment": "感謝您的訂閱",
+    }
+
+    try:
+        raw_data = "&".join(f"{k}={v}" for k, v in post_data.items() if v is not None)
+        encrypted = aes_encrypt(raw_data, HASH_KEY, HASH_IV)
+
+        payload_to_send = {
+            "MerchantID": MERCHANT_ID,
+            "PostData_": encrypted
+        }
+
+        # res = await httpx.post("https://cinv.ezpay.com.tw/Api/invoice_issue", data=payload_to_send)
+        # return res.json()
+
+        print("模擬開立發票成功 (含 AES 加密)")
+
+        return JSONResponse({
+            "message": "模擬開立發票成功 (含 AES 加密)",
+            "PostData_": encrypted,
+            "RawData": raw_data
+        })
+    except Exception as e:
+        return JSONResponse(status_code=500, content={"error": str(e)})
+
+
+
+
+
+
+
+
+
+
+
+
+
 # Linode proxy_main.py
 
 # from fastapi import FastAPI
