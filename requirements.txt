@@ -1,5 +1,5 @@
 fastapi
-uvicorn
+uvicorn[standard]
 pycryptodome
 python-multipart
 requests
@@ -8,6 +8,6 @@ datetime
 pytz
 
 httpx
-pydantic
+pydantic[email]
 python-dotenv
 cryptography

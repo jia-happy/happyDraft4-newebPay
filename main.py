@@ -14,7 +14,6 @@ import json
 import yagmail
 import hashlib
 import requests
-import httpx
 
 app = FastAPI()
 
