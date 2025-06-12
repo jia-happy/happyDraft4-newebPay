@@ -431,13 +431,13 @@ class InvoiceRequest(BaseModel):
     invoiceType: Literal['B2C', 'B2B']
     buyerName: Optional[str] = ''
     # buyerUBN: Optional[constr(regex=r'^\d{8}$')] = ''
-    buyerUBN: Optional[str] = Field(default='', regex=r'^\d{8}$')
+    buyerUBN: Optional[str] = Field(default='', pattern=r'^\d{8}$')
     email: EmailStr
     carrierType: Literal['', '1', '2']
     carrierNum: Optional[str] = ''
     donate: bool = False
     # loveCode: Optional[constr(regex=r'^\d{3,7}$')] = ''
-    loveCode: Optional[str] = Field(default='', regex=r'^\d{3,7}$')
+    loveCode: Optional[str] = Field(default='', pattern=r'^\d{3,7}$')
     printFlag: bool = False
     address: Optional[str] = ''
     itemPrice: int
