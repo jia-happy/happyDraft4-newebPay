@@ -6,3 +6,8 @@ requests
 yagmail
 datetime
 pytz
+
+httpx
+pydantic
+python-dotenv
+cryptography
