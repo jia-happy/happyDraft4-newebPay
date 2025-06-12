@@ -14,6 +14,7 @@ import json
 import yagmail
 import hashlib
 import requests
+import httpx
 
 app = FastAPI()
 
@@ -442,7 +443,7 @@ class InvoiceRequest(BaseModel):
     itemPrice: int
     itemAmt: int
 
-def aes_encrypt(data: str, key: str, iv: str) -> str:
+def ezpay_aes_encrypt(data: str, key: str, iv: str) -> str:
     cipher = AES.new(key.encode('utf-8'), AES.MODE_CBC, iv.encode('utf-8'))
     padded = pad(data.encode('utf-8'), AES.block_size)
     encrypted = cipher.encrypt(padded)
@@ -495,7 +496,7 @@ async def issue_invoice(payload: InvoiceRequest):
 
     try:
         raw_data = "&".join(f"{k}={v}" for k, v in post_data.items() if v is not None)
-        encrypted = aes_encrypt(raw_data, HASH_KEY, HASH_IV)
+        encrypted = ezpay_aes_encrypt(raw_data, HASH_KEY, HASH_IV)
 
         payload_to_send = {
             "MerchantID": MERCHANT_ID,
