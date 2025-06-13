@@ -548,16 +548,16 @@ async def issue_invoice(payload: InvoiceRequest):
 
         encrypted = ezpay_aes_encrypt(raw_data, HASH_KEY, HASH_IV)
 
-        # payload_to_send = {
-        #     "MerchantID": MERCHANT_ID,
-        #     "PostData_": encrypted
-        # }
-
-        # 將 payload 轉換為 URL encoded 格式
-        encoded_payload = urlencode({
+        payload_to_send = {
             "MerchantID": MERCHANT_ID,
             "PostData_": encrypted
-        })
+        }
+
+        # 將 payload 轉換為 URL encoded 格式
+        # encoded_payload = urlencode({
+        #     "MerchantID": MERCHANT_ID,
+        #     "PostData_": encrypted
+        # })
 
         headers = {
             "Content-Type": "application/x-www-form-urlencoded"
@@ -566,7 +566,8 @@ async def issue_invoice(payload: InvoiceRequest):
         async with httpx.AsyncClient() as client:
             res = await client.post(
                 "https://cinv.ezpay.com.tw/Api/invoice_issue", 
-                content=encoded_payload,     # ✅ 保持表單格式
+                # content=encoded_payload,     # ✅ 保持表單格式
+                data=payload_to_send,  # ✅ 自動幫你 encode 成 application/x-www-form-urlencoded
                 headers=headers            # ✅ 強制指定表單類型
             )
             return JSONResponse({
