@@ -564,7 +564,7 @@ async def issue_invoice(payload: InvoiceRequest):
         async with httpx.AsyncClient() as client:
             res = await client.post(
                 "https://cinv.ezpay.com.tw/Api/invoice_issue", 
-                data=encoded_payload,     # ✅ 保持表單格式
+                content=encoded_payload,     # ✅ 保持表單格式
                 headers=headers            # ✅ 強制指定表單類型
             )
             return JSONResponse({
