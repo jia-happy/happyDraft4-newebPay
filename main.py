@@ -520,8 +520,8 @@ async def issue_invoice(payload: InvoiceRequest):
             "PostData_": encrypted
         }
 
-        # res = await httpx.post("https://cinv.ezpay.com.tw/Api/invoice_issue", data=payload_to_send)
-        # return res.json()
+        res = await httpx.post("https://cinv.ezpay.com.tw/Api/invoice_issue", data=payload_to_send)
+        return res.json()
 
         print("模擬開立發票成功 (含 AES 加密)")
 
