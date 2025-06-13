@@ -425,6 +425,7 @@ from datetime import datetime, timezone
 from pydantic import field_validator
 import re
 from collections import OrderedDict
+from urllib.parse import urlencode
 
 # app = FastAPI()
 
@@ -545,10 +546,17 @@ async def issue_invoice(payload: InvoiceRequest):
 
         encrypted = ezpay_aes_encrypt(raw_data, HASH_KEY, HASH_IV)
 
-        payload_to_send = {
+        # payload_to_send = {
+        #     "MerchantID": MERCHANT_ID,
+        #     "PostData_": encrypted
+        # }
+
+        # 將 payload 轉換為 URL encoded 格式
+        encoded_payload = urlencode({
             "MerchantID": MERCHANT_ID,
             "PostData_": encrypted
-        }
+        })
+
         headers = {
             "Content-Type": "application/x-www-form-urlencoded"
         }
@@ -556,7 +564,7 @@ async def issue_invoice(payload: InvoiceRequest):
         async with httpx.AsyncClient() as client:
             res = await client.post(
                 "https://cinv.ezpay.com.tw/Api/invoice_issue", 
-                data=payload_to_send,     # ✅ 保持表單格式
+                data=encoded_payload,     # ✅ 保持表單格式
                 headers=headers            # ✅ 強制指定表單類型
             )
             return JSONResponse({
