@@ -466,7 +466,8 @@ def ezpay_aes_encrypt(data: str, key: str, iv: str) -> str:
     cipher = AES.new(key.encode('utf-8'), AES.MODE_CBC, iv.encode('utf-8'))
     padded = pad(data.encode('utf-8'), AES.block_size)
     encrypted = cipher.encrypt(padded)
-    return base64.b64encode(encrypted).decode('utf-8')
+    return binascii.hexlify(encrypted).decode("utf-8")  # ← 使用 HEX
+    # return base64.b64encode(encrypted).decode('utf-8')
 
 @app.post("/api/invoice/issue")
 async def issue_invoice(payload: InvoiceRequest):
