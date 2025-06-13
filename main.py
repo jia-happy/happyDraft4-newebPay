@@ -519,9 +519,16 @@ async def issue_invoice(payload: InvoiceRequest):
             "MerchantID": MERCHANT_ID,
             "PostData_": encrypted
         }
+        headers = {
+            "Content-Type": "application/x-www-form-urlencoded"
+        }
 
         async with httpx.AsyncClient() as client:
-            res = await client.post("https://cinv.ezpay.com.tw/Api/invoice_issue", data=payload_to_send)
+            res = await client.post(
+                "https://cinv.ezpay.com.tw/Api/invoice_issue", 
+                data=payload_to_send,     # ✅ 保持表單格式
+                headers=headers            # ✅ 強制指定表單類型
+            )
             return JSONResponse({
                 "message": "發票已送出",
                 "PostData_": encrypted,
@@ -536,7 +543,7 @@ async def issue_invoice(payload: InvoiceRequest):
         #     "PostData_": encrypted,
         #     "RawData": raw_data
         # })
-        
+
     except Exception as e:
         return JSONResponse(status_code=500, content={"error": str(e)})
 
