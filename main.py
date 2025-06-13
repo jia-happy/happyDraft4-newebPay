@@ -520,16 +520,23 @@ async def issue_invoice(payload: InvoiceRequest):
             "PostData_": encrypted
         }
 
-        res = await httpx.post("https://cinv.ezpay.com.tw/Api/invoice_issue", data=payload_to_send)
-        return res.json()
+        async with httpx.AsyncClient() as client:
+            res = await client.post("https://cinv.ezpay.com.tw/Api/invoice_issue", data=payload_to_send)
+            return JSONResponse({
+                "message": "發票已送出",
+                "PostData_": encrypted,
+                "RawData": raw_data,
+                "EzPayResponse": res.json()
+            })
 
-        print("模擬開立發票成功 (含 AES 加密)")
+        # print("模擬開立發票成功 (含 AES 加密)")
 
-        return JSONResponse({
-            "message": "模擬開立發票成功 (含 AES 加密)",
-            "PostData_": encrypted,
-            "RawData": raw_data
-        })
+        # return JSONResponse({
+        #     "message": "模擬開立發票成功 (含 AES 加密)",
+        #     "PostData_": encrypted,
+        #     "RawData": raw_data
+        # })
+        
     except Exception as e:
         return JSONResponse(status_code=500, content={"error": str(e)})
 
