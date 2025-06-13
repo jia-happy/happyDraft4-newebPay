@@ -543,8 +543,8 @@ async def issue_invoice(payload: InvoiceRequest):
 
     try:
         # raw_data = "&".join(f"{k}={v}" for k, v in post_data.items() if v is not None)
-        # raw_data = "&".join(f"{k}={v if v is not None else ''}" for k, v in post_data.items())
-        raw_data = urlencode(post_data)  # ← 正確 URL encode 後才加密
+        raw_data = "&".join(f"{k}={v if v is not None else ''}" for k, v in post_data.items())
+        # raw_data = urlencode(post_data)  # ← 正確 URL encode 後才加密
 
         encrypted = ezpay_aes_encrypt(raw_data, HASH_KEY, HASH_IV)
 
