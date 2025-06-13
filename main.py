@@ -422,6 +422,8 @@ import httpx
 import os
 from pydantic import Field
 from datetime import datetime, timezone
+from pydantic import field_validator
+import re
 
 # app = FastAPI()
 
@@ -430,17 +432,33 @@ class InvoiceRequest(BaseModel):
     invoiceType: Literal['B2C', 'B2B']
     buyerName: Optional[str] = ''
     # buyerUBN: Optional[constr(regex=r'^\d{8}$')] = ''
-    buyerUBN: Optional[str] = Field(default='', pattern=r'^\d{8}$')
+    # buyerUBN: Optional[str] = Field(default='', pattern=r'^\d{8}$')
+    buyerUBN: Optional[str] = None
     email: EmailStr
     carrierType: Literal['', '1', '2']
     carrierNum: Optional[str] = ''
     donate: bool = False
     # loveCode: Optional[constr(regex=r'^\d{3,7}$')] = ''
-    loveCode: Optional[str] = Field(default='', pattern=r'^\d{3,7}$')
+    # loveCode: Optional[str] = Field(default='', pattern=r'^\d{3,7}$')
+    loveCode: Optional[str] = None
     printFlag: bool = False
     address: Optional[str] = ''
     itemPrice: int
     itemAmt: int
+    
+    @field_validator('buyerUBN')
+    def validate_buyerUBN(cls, v, info):
+        if info.data.get('invoiceType') == 'B2B':
+            if not v or not re.match(r'^\d{8}$', v):
+                raise ValueError('統一編號需為 8 碼數字')
+        return v
+
+    @field_validator('loveCode')
+    def validate_loveCode(cls, v, info):
+        if info.data.get('donate'):
+            if not v or not re.match(r'^\d{3,7}$', v):
+                raise ValueError('捐贈碼需為 3~7 碼純數字')
+        return v
 
 def ezpay_aes_encrypt(data: str, key: str, iv: str) -> str:
     cipher = AES.new(key.encode('utf-8'), AES.MODE_CBC, iv.encode('utf-8'))
