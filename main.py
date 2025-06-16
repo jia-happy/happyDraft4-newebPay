@@ -20,12 +20,12 @@ app = FastAPI()
 # ✅ 加上這段：允許從 Framer Canvas 來的請求
 app.add_middleware(
     CORSMiddleware,
-    # allow_origins=[
-    #     "https://framer.com",
-    #     # "https://*.framercanvas.com",
-    #     "https://ha-pp-y.kitchen",  # 改成你的 Framer 網域
-    # ],
-    allow_origins=["*"], # 測試開發中可以先允許所有網域
+    allow_origins=[
+        # "https://framer.com",
+        # "https://*.framercanvas.com",
+        "https://ha-pp-y.kitchen",  # 改成你的 Framer 網域
+    ],
+    # allow_origins=["*"], # 測試開發中可以先允許所有網域
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
