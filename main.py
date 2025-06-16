@@ -437,7 +437,7 @@ class InvoiceRequest(BaseModel):
     # buyerUBN: Optional[str] = Field(default='', pattern=r'^\d{8}$')
     buyerUBN: Optional[str] = None
     email: EmailStr
-    carrierType: Literal['', '1', '2']
+    carrierType: Literal['', '0', '1']
     carrierNum: Optional[str] = ''
     donate: bool = False
     # loveCode: Optional[constr(regex=r'^\d{3,7}$')] = ''
@@ -502,8 +502,8 @@ async def issue_invoice(payload: InvoiceRequest):
 
     #     "TaxType": "1", # 應稅
     #     "TaxRate": 5, # 一般稅率/特種稅率？
-    #     "Amt": 100, # 發票銷售額(未稅)
-    #     "TaxAmt": 5, # 發票稅額
+    #     "Amt": 53918, # 發票銷售額(未稅)
+    #     "TaxAmt": 2696, # 發票稅額
     #     "TotalAmt": 56614, # 發票總金額(含稅)
 
     #     "ItemName": "ha-pp-y™ Kitchen 訂閱",
@@ -530,8 +530,8 @@ async def issue_invoice(payload: InvoiceRequest):
         ("PrintFlag", "Y" if payload.printFlag else "N"),
         ("TaxType", "1"),
         ("TaxRate", 5),
-        ("Amt", 100),
-        ("TaxAmt", 5),
+        ("Amt", 53918),
+        ("TaxAmt", 2696),
         ("TotalAmt", 56614),
         ("ItemName", "ha-pp-y™ Kitchen 訂閱"),
         ("ItemCount", "1"),
