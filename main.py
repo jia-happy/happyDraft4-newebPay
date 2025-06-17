@@ -67,6 +67,9 @@ def aes_decrypt(encrypted_str: str) -> str:
             # 改用 base64 解碼
             encrypted_bytes = base64.b64decode(encrypted_str)
             print("🔍 嘗試 base64 解碼成功")
+
+        print(f"HASH_KEY: {HASH_KEY}")
+        print(f"HASH_IV: {HASH_IV}")
         
         cipher = AES.new(HASH_KEY.encode("utf-8"), AES.MODE_CBC, HASH_IV.encode("utf-8"))
         decrypted_bytes = cipher.decrypt(encrypted_bytes)
