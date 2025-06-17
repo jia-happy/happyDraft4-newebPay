@@ -48,36 +48,56 @@ class PaymentRequest(BaseModel):
     taxId: str
     # order_id: str
 
-def pad(data: str):
-    pad_len = 32 - (len(data.encode('utf-8')) % 32)
-    return data + chr(pad_len) * pad_len
+from Crypto.Util.Padding import pad, unpad  # ✅ 用這個取代你自定義的 pad / strip_padding
 
 def aes_encrypt(data: str):
     cipher = AES.new(HASH_KEY.encode('utf-8'), AES.MODE_CBC, HASH_IV.encode('utf-8'))
-    encrypted = cipher.encrypt(pad(data).encode('utf-8'))
+    padded_data = pad(data.encode('utf-8'), AES.block_size)  # 🔁 指定 block_size=16
+    encrypted = cipher.encrypt(padded_data)
     return binascii.hexlify(encrypted).decode('utf-8')
-
-def strip_padding(data: bytes) -> str:
-    """移除 PKCS7 Padding"""
-    padding_len = data[-1]
-    return data[:-padding_len].decode("utf-8")
 
 def aes_decrypt(encrypted_hex: str) -> str:
     try:
-        # 將 hex 轉換為 bytes
         encrypted_bytes = binascii.unhexlify(encrypted_hex)
-        
-        # 建立 AES 解密器（使用 CBC 模式）
         cipher = AES.new(HASH_KEY.encode('utf-8'), AES.MODE_CBC, HASH_IV.encode('utf-8'))
-        
-        # 解密並去除 padding
         decrypted_bytes = cipher.decrypt(encrypted_bytes)
-        decrypted_text = strip_padding(decrypted_bytes)
-
+        decrypted_text = unpad(decrypted_bytes, AES.block_size).decode("utf-8")
         return decrypted_text
     except Exception as e:
         print("❌ 解密失敗：", str(e))
         return "Decryption failed"
+
+
+# def pad(data: str):
+#     pad_len = 32 - (len(data.encode('utf-8')) % 32)
+#     return data + chr(pad_len) * pad_len
+
+# def aes_encrypt(data: str):
+#     cipher = AES.new(HASH_KEY.encode('utf-8'), AES.MODE_CBC, HASH_IV.encode('utf-8'))
+#     encrypted = cipher.encrypt(pad(data).encode('utf-8'))
+#     return binascii.hexlify(encrypted).decode('utf-8')
+
+# def strip_padding(data: bytes) -> str:
+#     """移除 PKCS7 Padding"""
+#     padding_len = data[-1]
+#     return data[:-padding_len].decode("utf-8")
+
+# def aes_decrypt(encrypted_hex: str) -> str:
+#     try:
+#         # 將 hex 轉換為 bytes
+#         encrypted_bytes = binascii.unhexlify(encrypted_hex)
+        
+#         # 建立 AES 解密器（使用 CBC 模式）
+#         cipher = AES.new(HASH_KEY.encode('utf-8'), AES.MODE_CBC, HASH_IV.encode('utf-8'))
+        
+#         # 解密並去除 padding
+#         decrypted_bytes = cipher.decrypt(encrypted_bytes)
+#         decrypted_text = strip_padding(decrypted_bytes)
+
+#         return decrypted_text
+#     except Exception as e:
+#         print("❌ 解密失敗：", str(e))
+#         return "Decryption failed"
 
 def send_email(email, subject, body):
     yag = yagmail.SMTP("happy.it.engineer@gmail.com", "kvxxurwgcihmsqca")  # 建議開啟 2FA
