@@ -59,24 +59,18 @@ def aes_encrypt(data: str):
 
 def aes_decrypt(encrypted_str: str) -> str:
     try:
-        # 嘗試 hex 解碼
         try:
             encrypted_bytes = bytes.fromhex(encrypted_str)
             print("🔍 嘗試 hex 解碼成功")
         except ValueError:
-            # 改用 base64 解碼
             encrypted_bytes = base64.b64decode(encrypted_str)
             print("🔍 嘗試 base64 解碼成功")
-
-        print(f"HASH_KEY: {HASH_KEY}")
-        print(f"HASH_IV: {HASH_IV}")
         
         cipher = AES.new(HASH_KEY.encode("utf-8"), AES.MODE_CBC, HASH_IV.encode("utf-8"))
-
         decrypted_bytes = cipher.decrypt(encrypted_bytes)
         print("🔍 解密 raw bytes：", decrypted_bytes)
 
-        decrypted_text = unpad(decrypted_bytes, AES.block_size).decode("utf-8")
+        decrypted_text = strip_padding(decrypted_bytes)
         return decrypted_text
     except Exception as e:
         print("❌ 解密失敗：", str(e))
@@ -92,10 +86,10 @@ def aes_decrypt(encrypted_str: str) -> str:
 #     encrypted = cipher.encrypt(pad(data).encode('utf-8'))
 #     return binascii.hexlify(encrypted).decode('utf-8')
 
-# def strip_padding(data: bytes) -> str:
-#     """移除 PKCS7 Padding"""
-#     padding_len = data[-1]
-#     return data[:-padding_len].decode("utf-8")
+def strip_padding(data: bytes) -> str:
+    """移除 PKCS7 Padding"""
+    padding_len = data[-1]
+    return data[:-padding_len].decode("utf-8")
 
 # def aes_decrypt(encrypted_hex: str) -> str:
 #     try:
