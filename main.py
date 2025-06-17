@@ -49,8 +49,13 @@ class PaymentRequest(BaseModel):
     # order_id: str
 
 from Crypto.Util.Padding import pad, unpad  # ✅ 用這個取代你自定義的 pad / strip_padding
-
 import base64
+
+def aes_encrypt(data: str):
+    cipher = AES.new(HASH_KEY.encode('utf-8'), AES.MODE_CBC, HASH_IV.encode('utf-8'))
+    padded_data = pad(data.encode('utf-8'), AES.block_size)  # 🔁 指定 block_size=16
+    encrypted = cipher.encrypt(padded_data)
+    return binascii.hexlify(encrypted).decode('utf-8')
 
 def aes_decrypt(encrypted_str: str) -> str:
     try:
@@ -64,18 +69,6 @@ def aes_decrypt(encrypted_str: str) -> str:
             print("🔍 嘗試 base64 解碼成功")
         
         cipher = AES.new(HASH_KEY.encode("utf-8"), AES.MODE_CBC, HASH_IV.encode("utf-8"))
-        decrypted_bytes = cipher.decrypt(encrypted_bytes)
-        decrypted_text = unpad(decrypted_bytes, AES.block_size).decode("utf-8")
-        return decrypted_text
-    except Exception as e:
-        print("❌ 解密失敗：", str(e))
-        return "Decryption failed"
-
-
-def aes_decrypt(encrypted_hex: str) -> str:
-    try:
-        encrypted_bytes = binascii.unhexlify(encrypted_hex)
-        cipher = AES.new(HASH_KEY.encode('utf-8'), AES.MODE_CBC, HASH_IV.encode('utf-8'))
         decrypted_bytes = cipher.decrypt(encrypted_bytes)
         decrypted_text = unpad(decrypted_bytes, AES.block_size).decode("utf-8")
         return decrypted_text
