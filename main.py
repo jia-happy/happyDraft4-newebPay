@@ -484,35 +484,6 @@ async def issue_invoice(payload: InvoiceRequest):
     now = int(datetime.now(timezone.utc).timestamp())
     is_b2b = payload.invoiceType == "B2B"
 
-    # post_data = {
-    #     "MerchantID": MERCHANT_ID,
-    #     "RespondType": "JSON",
-    #     "Version": "1.5",
-    #     "TimeStamp": str(now),
-    #     "MerchantOrderNo": payload.merchantOrderNo,
-    #     "Status": "1",
-    #     "Category": payload.invoiceType,
-    #     "BuyerName": payload.buyerName,
-    #     "BuyerUBN": payload.buyerUBN,
-    #     "BuyerEmail": payload.email,
-    #     "CarrierType": payload.carrierType,
-    #     "CarrierNum": carrier_num_encoded,
-    #     "LoveCode": payload.loveCode,
-    #     "PrintFlag": "Y" if payload.printFlag else "N",
-
-    #     "TaxType": "1", # 應稅
-    #     "TaxRate": 5, # 一般稅率/特種稅率？
-    #     "Amt": 53918, # 發票銷售額(未稅)
-    #     "TaxAmt": 2696, # 發票稅額
-    #     "TotalAmt": 56614, # 發票總金額(含稅)
-
-    #     "ItemName": "ha-pp-y™ Kitchen 訂閱",
-    #     "ItemCount": "1",
-    #     "ItemUnit": "月",
-    #     "ItemPrice": payload.itemPrice,
-    #     "ItemAmt": payload.itemAmt,
-    #     "Comment": "感謝您的訂閱",
-    # }
     post_data = OrderedDict([
         ("MerchantID", MERCHANT_ID),
         ("RespondType", "JSON"),
@@ -546,10 +517,12 @@ async def issue_invoice(payload: InvoiceRequest):
         raw_data = "&".join(f"{k}={v if v is not None else ''}" for k, v in post_data.items())
         # raw_data = urlencode(post_data)  # ← 正確 URL encode 後才加密
 
+        print(f"HASH_KEY: {HASH_KEY}")
+        print(f"HASH_IV: {HASH_IV}")
         encrypted = ezpay_aes_encrypt(raw_data, HASH_KEY, HASH_IV)
 
         payload_to_send = {
-            "MerchantID": MERCHANT_ID,
+            "MerchantID_": MERCHANT_ID,
             "PostData_": encrypted
         }
 
