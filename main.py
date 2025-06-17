@@ -72,7 +72,10 @@ def aes_decrypt(encrypted_str: str) -> str:
         print(f"HASH_IV: {HASH_IV}")
         
         cipher = AES.new(HASH_KEY.encode("utf-8"), AES.MODE_CBC, HASH_IV.encode("utf-8"))
+
         decrypted_bytes = cipher.decrypt(encrypted_bytes)
+        print("🔍 解密 raw bytes：", decrypted_bytes)
+
         decrypted_text = unpad(decrypted_bytes, AES.block_size).decode("utf-8")
         return decrypted_text
     except Exception as e:
