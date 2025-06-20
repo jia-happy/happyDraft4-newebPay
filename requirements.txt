@@ -13,3 +13,5 @@ python-dotenv
 cryptography
 
 python-dotenv
+gspread
+oauth2client

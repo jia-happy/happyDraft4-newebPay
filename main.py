@@ -613,38 +613,65 @@ async def issue_invoice(payload: InvoiceRequest):
 import os
 from dotenv import load_dotenv
 
+# def fetch_invoice_info(merchant_order_no: str) -> dict:
+#     SHEET_ID = "1VfXMjiZogG1K_vhd8vMxMxjKfAYi2JDXOvUE51mdYTQ"
+#     SHEET_NAME = "invoice"
+#     # API_KEY = "YOUR_GOOGLE_API_KEY"
+#     load_dotenv()
+#     API_KEY = os.getenv("GOOGLE_API_KEY")
+#     print("API_KEY:", API_KEY or "❌ 未找到")
+
+#     url = f"https://sheets.googleapis.com/v4/spreadsheets/{SHEET_ID}/values/{SHEET_NAME}?key={API_KEY}"
+
+#     res = requests.get(url)
+#     if res.status_code != 200:
+#         print("❌ 無法讀取 Google Sheets")
+#         return {}
+
+#     values = res.json().get("values", [])
+#     if not values or len(values) < 2:
+#         return {}
+
+#     header = values[0]
+#     rows = values[1:]
+
+#     try:
+#         order_idx = header.index("merchantOrderNo")
+#     except ValueError:
+#         return {}
+
+#     for row in rows:
+#         if len(row) > order_idx and row[order_idx] == merchant_order_no:
+#             return dict(zip(header, row))
+
+#     return {}
+
+
+
+import json
+from oauth2client.service_account import ServiceAccountCredentials
+import gspread
+
 def fetch_invoice_info(merchant_order_no: str) -> dict:
-    SHEET_ID = "1VfXMjiZogG1K_vhd8vMxMxjKfAYi2JDXOvUE51mdYTQ"
-    SHEET_NAME = "invoice"
-    # API_KEY = "YOUR_GOOGLE_API_KEY"
-    load_dotenv()
-    API_KEY = os.getenv("GOOGLE_API_KEY")
-    print("API_KEY:", API_KEY or "❌ 未找到")
-
-    url = f"https://sheets.googleapis.com/v4/spreadsheets/{SHEET_ID}/values/{SHEET_NAME}?key={API_KEY}"
-
-    res = requests.get(url)
-    if res.status_code != 200:
-        print("❌ 無法讀取 Google Sheets")
-        return {}
-
-    values = res.json().get("values", [])
-    if not values or len(values) < 2:
-        return {}
-
-    header = values[0]
-    rows = values[1:]
-
     try:
-        order_idx = header.index("merchantOrderNo")
-    except ValueError:
+        creds_dict = json.loads(os.getenv("GOOGLE_SHEET_CREDENTIALS_JSON"))
+
+        scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
+        creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
+
+        client = gspread.authorize(creds)
+        sheet = client.open_by_key(os.getenv("GOOGLE_SHEET_ID")).worksheet("invoice")
+        rows = sheet.get_all_records()
+
+        for row in rows:
+            if row.get("merchantOrderNo") == merchant_order_no:
+                return row
+        return {}
+    except Exception as e:
+        print("❌ 讀取 Google Sheet 發生錯誤:", e)
         return {}
 
-    for row in rows:
-        if len(row) > order_idx and row[order_idx] == merchant_order_no:
-            return dict(zip(header, row))
 
-    return {}
 
 
 
