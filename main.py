@@ -672,7 +672,7 @@ def fetch_invoice_info(merchant_order_no: str) -> dict:
         rows = sheet.get_all_records()
 
         for row in rows:
-            if row.get("merchantOrderNo") == merchant_order_no:
+            if str(row.get("merchantOrderNo")) == str(merchant_order_no):
                 return row
         return {}
     except Exception as e:
