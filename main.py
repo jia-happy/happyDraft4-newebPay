@@ -20,12 +20,12 @@ app = FastAPI()
 # ✅ 加上這段：允許從 Framer Canvas 來的請求
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        # "https://framer.com",
-        # "https://*.framercanvas.com",
-        "https://ha-pp-y.kitchen",  # 改成你的 Framer 網域
-    ],
-    # allow_origins=["*"], # 測試開發中可以先允許所有網域
+    # allow_origins=[
+    #     # "https://framer.com",
+    #     # "https://*.framercanvas.com",
+    #     "https://ha-pp-y.kitchen",  # 改成你的 Framer 網域
+    # ],
+    allow_origins=["*"], # 測試開發中可以先允許所有網域
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -565,8 +565,8 @@ async def issue_invoice(payload: InvoiceRequest):
         raw_data = "&".join(f"{k}={v if v is not None else ''}" for k, v in post_data.items())
         # raw_data = urlencode(post_data)  # ← 正確 URL encode 後才加密
 
-        print(f"HASH_KEY: {HASH_KEY}")
-        print(f"HASH_IV: {HASH_IV}")
+        # print(f"HASH_KEY: {HASH_KEY}")
+        # print(f"HASH_IV: {HASH_IV}")
         encrypted = ezpay_aes_encrypt(raw_data, HASH_KEY, HASH_IV)
 
         payload_to_send = {
@@ -655,6 +655,7 @@ import gspread
 def fetch_invoice_info(merchant_order_no: str) -> dict:
     try:
         creds_dict = json.loads(os.getenv("GOOGLE_SHEET_CREDENTIALS_JSON"))
+        # print("🔍 Render 環境變數長度:", len(os.getenv("GOOGLE_SHEET_CREDENTIALS_JSON") or ""))
 
         scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
         creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
