@@ -21,12 +21,12 @@ app = FastAPI()
 # ✅ 加上這段：允許從 Framer Canvas 來的請求
 app.add_middleware(
     CORSMiddleware,
-    # allow_origins=[
-    #     # "https://framer.com",
-    #     # "https://*.framercanvas.com",
-    #     "https://ha-pp-y.kitchen",  # 改成你的 Framer 網域
-    # ],
-    allow_origins=["*"], # 測試開發中可以先允許所有網域
+    allow_origins=[
+        # "https://framer.com",
+        # "https://*.framercanvas.com",
+        "https://ha-pp-y.kitchen",  # 改成你的 Framer 網域
+    ],
+    # allow_origins=["*"], # 測試開發中可以先允許所有網域
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -187,7 +187,7 @@ def create_payment(req: PaymentRequest):
         "ProdDesc": "訂閱方案",
         "PeriodAmt": str(req.amount),
         "PeriodType": "D",
-        "PeriodPoint": "30",
+        "PeriodPoint": "2",
         "PeriodStartType": "2",
         "PeriodTimes": "12",
         "PayerEmail": req.email,
@@ -239,8 +239,8 @@ async def payment_notify(request: Request):
         return "0|No Period"
     
     
-    # ✅ 先進行 URL decode，轉回原始 base64 字串
-    encrypted = unquote_plus(encrypted)
+    # # ✅ 先進行 URL decode，轉回原始 base64 字串
+    # encrypted = unquote_plus(encrypted)
 
     # Step5: 將加密字串進行解密
     decrypted = aes_decrypt(encrypted)
@@ -297,7 +297,9 @@ async def payment_notify(request: Request):
         send_email(email, f"ha-pp-y™ Kitchen 訂閱成功 - {order_no}", contents)
 
 
-    if status == "success":
+    if status == "success" and result.get("AlreadyTimes"):
+        print(f"✅ 第 {result['AlreadyTimes']} 期扣款成功，自動開立發票中...")
+
         # test_order_no="202506201555021234"
         # invoice_info = fetch_invoice_info(test_order_no)
         invoice_info = fetch_invoice_info(str(order_no))
