@@ -610,12 +610,16 @@ async def issue_invoice(payload: InvoiceRequest):
         return JSONResponse(status_code=500, content={"error": str(e)})
 
 
-
+import os
+from dotenv import load_dotenv
 
 def fetch_invoice_info(merchant_order_no: str) -> dict:
     SHEET_ID = "1VfXMjiZogG1K_vhd8vMxMxjKfAYi2JDXOvUE51mdYTQ"
     SHEET_NAME = "invoice"
-    API_KEY = "AIzaSyA38i9rH2cADmMsJZZTU18gGnDYJuLECW0"
+    # API_KEY = "YOUR_GOOGLE_API_KEY"
+    load_dotenv()
+    API_KEY = os.getenv("GOOGLE_API_KEY")
+
     url = f"https://sheets.googleapis.com/v4/spreadsheets/{SHEET_ID}/values/{SHEET_NAME}?key={API_KEY}"
 
     res = requests.get(url)
