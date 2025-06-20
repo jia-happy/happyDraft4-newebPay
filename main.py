@@ -291,6 +291,25 @@ async def payment_notify(request: Request):
         
         send_email(email, f"ha-pp-y™ Kitchen 訂閱成功 - {order_no}", contents)
 
+
+    if status == "success":
+        invoice_info = fetch_invoice_info(order_no)
+        print("🧾 查詢到發票偏好：", invoice_info)
+
+        if invoice_info:
+            # 呼叫開立發票 API
+            async with httpx.AsyncClient() as client:
+                res = await client.post(
+                    "https://happydraft4-newebpay.onrender.com/api/invoice/issue",
+                    json={
+                        **invoice_info,
+                        "merchantOrderNo": order_no,
+                        "itemPrice": 53918,
+                        "itemAmt": 53918,
+                    }
+                )
+                print("📤 發票開立結果：", res.text)
+
     return "1|OK"
 
 
@@ -592,6 +611,35 @@ async def issue_invoice(payload: InvoiceRequest):
 
 
 
+
+def fetch_invoice_info(merchant_order_no: str) -> dict:
+    SHEET_ID = "1VfXMjiZogG1K_vhd8vMxMxjKfAYi2JDXOvUE51mdYTQ"
+    SHEET_NAME = "invoice"
+    API_KEY = "AIzaSyA38i9rH2cADmMsJZZTU18gGnDYJuLECW0"
+    url = f"https://sheets.googleapis.com/v4/spreadsheets/{SHEET_ID}/values/{SHEET_NAME}?key={API_KEY}"
+
+    res = requests.get(url)
+    if res.status_code != 200:
+        print("❌ 無法讀取 Google Sheets")
+        return {}
+
+    values = res.json().get("values", [])
+    if not values or len(values) < 2:
+        return {}
+
+    header = values[0]
+    rows = values[1:]
+
+    try:
+        order_idx = header.index("merchantOrderNo")
+    except ValueError:
+        return {}
+
+    for row in rows:
+        if len(row) > order_idx and row[order_idx] == merchant_order_no:
+            return dict(zip(header, row))
+
+    return {}
 
 
 
