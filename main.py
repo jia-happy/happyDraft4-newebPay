@@ -8,6 +8,7 @@ from datetime import datetime
 import pytz
 import time
 import urllib.parse
+from urllib.parse import unquote_plus
 import binascii
 import requests
 import json
@@ -236,6 +237,10 @@ async def payment_notify(request: Request):
     encrypted = form.get("Period")
     if not encrypted:
         return "0|No Period"
+    
+    
+    # ✅ 先進行 URL decode，轉回原始 base64 字串
+    encrypted = unquote_plus(encrypted)
 
     # Step5: 將加密字串進行解密
     decrypted = aes_decrypt(encrypted)
