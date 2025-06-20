@@ -673,6 +673,10 @@ def fetch_invoice_info(merchant_order_no: str) -> dict:
 
         for row in rows:
             if str(row.get("merchantOrderNo")) == str(merchant_order_no):
+                row["buyerName"] = str(row.get("buyerName", ""))
+                row["buyerUBN"] = str(row.get("buyerUBN", ""))
+                row["donate"] = row.get("donate", "") == "Y"
+                row["printFlag"] = row.get("printFlag", "") == "Y"
                 return row
         return {}
     except Exception as e:
