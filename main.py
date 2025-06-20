@@ -298,7 +298,9 @@ async def payment_notify(request: Request):
 
 
     if status == "success":
-        invoice_info = fetch_invoice_info(order_no)
+        test_order_no="202506201555021234"
+        invoice_info = fetch_invoice_info(test_order_no)
+        # invoice_info = fetch_invoice_info(order_no)
         print("🧾 查詢到發票偏好：", invoice_info)
 
         if invoice_info:
