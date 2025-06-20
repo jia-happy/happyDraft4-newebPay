@@ -619,6 +619,7 @@ def fetch_invoice_info(merchant_order_no: str) -> dict:
     # API_KEY = "YOUR_GOOGLE_API_KEY"
     load_dotenv()
     API_KEY = os.getenv("GOOGLE_API_KEY")
+    print("API_KEY:", API_KEY or "❌ 未找到")
 
     url = f"https://sheets.googleapis.com/v4/spreadsheets/{SHEET_ID}/values/{SHEET_NAME}?key={API_KEY}"
 
